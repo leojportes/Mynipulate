@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "caixa-de-embalagem.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
