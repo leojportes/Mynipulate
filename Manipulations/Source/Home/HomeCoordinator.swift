@@ -11,6 +11,7 @@ final class HomeCoordinator: BaseCoordinator {
     override func start() {
         let viewModel = HomeViewModel(coordinator: self)
         let controller = HomeViewController(viewModel: viewModel, coordinator: self)
+        configuration.viewController = controller
         configuration.navigationController?.pushViewController(controller, animated: true)
     }
 

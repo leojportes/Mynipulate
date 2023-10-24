@@ -14,17 +14,18 @@ final class RegisterManipulationConfirmStepViewController: CoordinatedViewContro
     private let thirdStepModel: RegisterManipulationThirdStep
     
     private let viewModel: RegisterManipulationConfirmStepViewModel
+
     
     private var finalModel: Manipulation {
         Manipulation(
-            emailFirebase: "leojportes@gmail.com",
+            emailFirebase: Current.shared.email,
             product: firstStepModel.productName,
             productType: firstStepModel.productType.iconTitle,
             date: firstStepModel.date,
             responsibleName: firstStepModel.responsible,
             supplier: firstStepModel.supply,
-            grossWeight: secondStepModel.grossWeight,
-            cleanWeight: secondStepModel.cleanWeight,
+            grossWeight: Double(secondStepModel.grossWeight) ?? 0.0,
+            cleanWeight: Double(secondStepModel.cleanWeight) ?? 0.0,
             thawedWeight: secondStepModel.thawedWeight,
             skinWeight: secondStepModel.skinWeight,
             cookedWeight: thirdStepModel.cookedWeight,
@@ -77,12 +78,25 @@ final class RegisterManipulationConfirmStepViewController: CoordinatedViewContro
     }
 
     private func registerManipulation(_ model: Manipulation) {
-
-        viewModel.registerManipulation(manipulation: model) { [ weak self ] result in
+        let modelFinal = Manipulation(
+            emailFirebase: Current.shared.email,
+            product: firstStepModel.productName,
+            productType: firstStepModel.productType.iconTitle,
+            date: firstStepModel.date,
+            responsibleName: firstStepModel.responsible,
+            supplier: firstStepModel.supply,
+            grossWeight: Double(secondStepModel.grossWeight) ?? 0.0,
+            cleanWeight: Double(secondStepModel.cleanWeight) ?? 0.0,
+            thawedWeight: secondStepModel.thawedWeight,
+            skinWeight: secondStepModel.skinWeight,
+            cookedWeight: thirdStepModel.cookedWeight,
+            headlessWeight: thirdStepModel.headlessWeight,
+            discardWeight: thirdStepModel.discardWeight
+        )
+        viewModel.registerManipulation(manipulation: modelFinal) { [ weak self ] result in
             if result {
                 self?.rootView.registerButton.loadingIndicator(show: false)
                 self?.showAlert(title: "", message: "Adicionado com sucesso!") { [weak self] in
-                    self?.dismiss(animated: true)
                     self?.viewModel.pop()
                 }
             } else {

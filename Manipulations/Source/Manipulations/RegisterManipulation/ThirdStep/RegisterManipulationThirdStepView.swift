@@ -14,6 +14,10 @@ public struct RegisterManipulationThirdStep {
 }
 
 final class RegisterManipulationThirdStepView: MNView, ViewCodeContract {
+
+    private var cookedWeightValue = ""
+    private var headlessWeightValue = ""
+    private var discardWeightValue = ""
     
     private let showAlertAction: Action
     private let didTapContinue: (RegisterManipulationThirdStep) -> Void
@@ -47,7 +51,7 @@ final class RegisterManipulationThirdStepView: MNView, ViewCodeContract {
     // OPICIONAL
     private lazy var cookedWeightLabel = MNLabel(text: "Peso cozido")
     private lazy var cookedWeightTextField = CustomTextField(
-        titlePlaceholder: "Ex: 4,00 Kg (opcional)",
+        titlePlaceholder: "ex: 4000g (opcional)",
         radius: 10,
         borderColor: UIColor.opaqueSeparator.cgColor,
         borderWidth: 1
@@ -60,7 +64,7 @@ final class RegisterManipulationThirdStepView: MNView, ViewCodeContract {
     // OPICIONAL
     private lazy var headlessWeightLabel = MNLabel(text: "Peso sem cabeça")
     private lazy var headlessWeightTextField = CustomTextField(
-        titlePlaceholder: "Ex: 4,00 Kg (opcional)",
+        titlePlaceholder: "ex: 4000g (opcional)",
         radius: 10,
         borderColor: UIColor.opaqueSeparator.cgColor,
         borderWidth: 1
@@ -72,7 +76,7 @@ final class RegisterManipulationThirdStepView: MNView, ViewCodeContract {
 
     private lazy var discardWeightLabel = MNLabel(text: "Peso descarte")
     private lazy var discardWeightTextField = CustomTextField(
-        titlePlaceholder: "Ex: 4,00 Kg (opcional)",
+        titlePlaceholder: "ex: 4000g (opcional)",
         radius: 10,
         borderColor: UIColor.opaqueSeparator.cgColor,
         borderWidth: 1
@@ -177,22 +181,14 @@ final class RegisterManipulationThirdStepView: MNView, ViewCodeContract {
 
     @objc func didTapRegisterAction() {
         let model = RegisterManipulationThirdStep(
-            cookedWeight: cookedWeightTextField.text.orEmpty,
-            headlessWeight: headlessWeightTextField.text.orEmpty,
-            discardWeight: discardWeightTextField.text.orEmpty
+            cookedWeight: cookedWeightValue,
+            headlessWeight: headlessWeightValue,
+            discardWeight: discardWeightValue
         )
 
         didTapContinue(model)
     }
 
-    public func formatWeight(weightInKgs: Double) -> String {
-        let mformatter = MeasurementFormatter()
-        mformatter.locale = Locale(identifier: "pt_BR")
-        mformatter.unitOptions = .naturalScale
-        mformatter.unitStyle = .medium
-        let weight = Measurement(value: weightInKgs, unit: UnitMass.grams)
-        return mformatter.string(from: weight)
-    }
 }
 
 extension RegisterManipulationThirdStepView: UITextFieldDelegate {
@@ -200,7 +196,11 @@ extension RegisterManipulationThirdStepView: UITextFieldDelegate {
         let maxLength: Int = 20
         let currentString = (textField.text.orEmpty) as NSString
         let newString = currentString.replacingCharacters(in: range, with: string)
-     
+
+        if textField == cookedWeightTextField { cookedWeightValue = newString }
+        if textField == headlessWeightTextField { headlessWeightValue = newString }
+        if textField == discardWeightTextField { discardWeightValue = newString }
+
         return newString.count <= maxLength
     }
     
@@ -212,9 +212,7 @@ extension RegisterManipulationThirdStepView: UITextFieldDelegate {
     
     func textFieldDidEndEditing(_ textField: UITextField) {
         guard let text = textField.text else { return }
-        guard let doubleValue = Double(text) else { return }
-        textField.text = formatWeight(weightInKgs: doubleValue)
-        
+        textField.text = text.formatWeight
         self.activeTextField = nil
     }
 

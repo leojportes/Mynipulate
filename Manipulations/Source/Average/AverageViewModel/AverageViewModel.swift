@@ -12,6 +12,8 @@ protocol AverageViewModelProtocol: AnyObject {
     var output: AverageViewModelOutputProtocol { get }
 
     func openAverageList(averageType: UseAveragesType, _ products: [Product], _ contributors: [Contributor], _ manipulations: [Manipulation])
+
+    func openManipulationList(for item: String)
 }
 
 // MARK: - Protocols
@@ -71,6 +73,10 @@ class AverageViewModel: AverageViewModelProtocol, AverageViewModelOutputProtocol
             contributors,
             manipulations
         )
+    }
+
+    func openManipulationList(for item: String) {
+
     }
 }
 

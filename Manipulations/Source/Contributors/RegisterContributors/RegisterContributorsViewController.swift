@@ -52,8 +52,9 @@ final class RegisterContributorsViewController: CoordinatedViewController {
             if result {
                 self?.rootView.registerButton.loadingIndicator(show: false)
                 self?.showAlert(title: "", message: "Adicionado com sucesso!") { [weak self] in
-                    self?.dismiss(animated: true)
-                    self?.viewModel.pop()
+                    self?.dismiss(animated: true) {
+                        self?.viewModel.pop()
+                    }
                 }
             } else {
                 DispatchQueue.main.async {

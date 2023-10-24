@@ -11,10 +11,10 @@ final class ManipulationsDetailView: UIView {
     
     private let manipulation: Manipulation
     
-    private let isContributorMode = MNUserDefaults.get(boolForKey: .contributorMode) ?? true
+    private let isContributorMode = Current.shared.isContributorMode
     private let showAlertAction: (String) -> Void
     private let didTapEditAction: Action
-    private let didTapDeleteAction: Action
+    private let didTapDeleteAction: (String) -> Void
     
     // MARK: - Init
     
@@ -22,7 +22,7 @@ final class ManipulationsDetailView: UIView {
         item: Manipulation,
         showAlertAction: @escaping (String) -> Void,
         didTapEditAction: @escaping Action,
-        didTapDeleteAction: @escaping Action
+        didTapDeleteAction: @escaping (String) -> Void
     ) {
         self.showAlertAction = showAlertAction
         self.didTapEditAction = didTapEditAction
@@ -39,21 +39,20 @@ final class ManipulationsDetailView: UIView {
     }
     
     // MARK: - View
-    private lazy var gripView = GripView()
     
     private lazy var productIcon = UIImageView() .. {
         $0.translatesAutoresizingMaskIntoConstraints = false
         $0.image = UIImage(systemName: "plus")
     }
-    private lazy var productLabel = MNLabel(text: manipulation.product) .. {
-        $0.font = .boldSystemFont(ofSize: 18)
+    private lazy var productLabel = MNLabel(text: manipulation.product, textColor: .neutralHigh) .. {
+        $0.font = .boldSystemFont(ofSize: 20)
     }
 
     private lazy var dateLabel = MNLabel(text: manipulation.date) .. {
         $0.textAlignment = .right
     }
 
-    private lazy var averageView = AveragePercentView(title: "Aproveitamento", value: manipulation.avarage) .. {
+    private lazy var averageView = AveragePercentView(title: "Aproveitamento", value: manipulation.avarageDescription) .. {
         $0.backgroundColor = .neutralLow
         $0.layer.borderColor = UIColor.neutral.cgColor
         $0.layer.borderWidth = 1
@@ -76,13 +75,17 @@ final class ManipulationsDetailView: UIView {
         $0.addShadow()
     }
 
-    private lazy var grossWeightView = TitleAndValueView(title: "Peso bruto", value: manipulation.grossWeight)
-    private lazy var cleanWeightView = TitleAndValueView(title: "Peso limpo", value: manipulation.cleanWeight)
-    private lazy var thawedWeightView = TitleAndValueView(title: "Peso descongelado", value: manipulation.thawedWeight.orEmpty)
-    private lazy var headlessWeightView = TitleAndValueView(title: "Peso sem cabeça", value: manipulation.headlessWeight.orEmpty)
-    private lazy var skinWeightView = TitleAndValueView(title: "Peso da pele", value: manipulation.skinWeight.orEmpty)
-    private lazy var cookedWeightView = TitleAndValueView(title: "Peso cozido", value: manipulation.cookedWeight.orEmpty)
-    private lazy var discardWeightView = TitleAndValueView(title: "Peso descarte", value: manipulation.discardWeight.orEmpty, showSeparator: false)
+    private lazy var grossWeightView = TitleAndValueView(title: "Peso bruto", value: manipulation.grossWeight.description.formatWeight)
+    private lazy var cleanWeightView = TitleAndValueView(title: "Peso limpo", value: manipulation.cleanWeight.description.formatWeight)
+    private lazy var thawedWeightView = TitleAndValueView(title: "Peso descongelado", value: manipulation.thawedWeight?.formatWeight ?? "-")
+    private lazy var headlessWeightView = TitleAndValueView(title: "Peso sem cabeça", value: manipulation.headlessWeight?.formatWeight ?? "-")
+    private lazy var skinWeightView = TitleAndValueView(title: "Peso da pele", value: manipulation.skinWeight?.formatWeight ?? "-")
+    private lazy var cookedWeightView = TitleAndValueView(title: "Peso cozido", value: manipulation.cookedWeight?.formatWeight ?? "-")
+    private lazy var discardWeightView = TitleAndValueView(
+        title: "Peso descarte",
+        value: manipulation.discardWeight?.formatWeight ?? "-",
+        showSeparator: false
+    )
     
     private lazy var editButton = CustomSubmitButton(
         title: "Editar",
@@ -113,7 +116,7 @@ final class ManipulationsDetailView: UIView {
         if isContributorMode {
             showAlertAction("Deletar")
         } else {
-            print("delete")
+            didTapDeleteAction(manipulation._id)
         }
     }
 
@@ -126,7 +129,6 @@ final class ManipulationsDetailView: UIView {
 extension ManipulationsDetailView: ViewCodeContract {
     
     func setupHierarchy() {
-        addSubview(gripView)
         addSubview(productIcon)
         addSubview(productLabel)
         
@@ -152,23 +154,19 @@ extension ManipulationsDetailView: ViewCodeContract {
     }
     
     func setupConstraints() {
-        gripView
-            .centerX(in: self)
-            .topAnchor(in: self, padding: 10)
-        
         productIcon
-            .topAnchor(in: self, padding: 40)
+            .topAnchor(in: self, padding: .medium)
             .leftAnchor(in: self, padding: .medium)
             .widthAnchor(40)
             .heightAnchor(40)
         
         productLabel
-            .topAnchor(in: self, padding: 50)
+            .topAnchor(in: self, padding: .medium + 10)
             .leftAnchor(in: productIcon, attribute: .right, padding: .medium)
             .heightAnchor(25)
         
         dateLabel
-            .topAnchor(in: self, padding: 50)
+            .topAnchor(in: self, padding: .medium + 10)
             .rightAnchor(in: self, padding: .medium)
             .widthAnchor(100)
             .heightAnchor(24)
@@ -290,7 +288,7 @@ public class TitleAndValueView: UIView, ViewCodeContract {
     private lazy var valueLabel = MNLabel(text: value) .. {
         $0.textAlignment = .right
         $0.font = .boldSystemFont(ofSize: 15)
-        $0.textColor = .neutral
+        $0.textColor = .misteryGreen
     }
 
     private lazy var horizontalView = UIView() .. {

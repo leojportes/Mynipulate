@@ -18,7 +18,12 @@ final class RegisterManipulationSecondStepView: MNView, ViewCodeContract {
     
     private let showAlertAction: (String) -> Void
     private let didTapContinue: (RegisterManipulationSecondStep) -> Void
-    
+
+    private var grossWeightValue: String = ""
+    private var cleanWeightValue: String = ""
+    private var thawedWeightValue: String = ""
+    private var skinWeightValue: String = ""
+
     // MARK: - Init
     init(
         showAlertAction: @escaping (String) -> Void,
@@ -48,7 +53,7 @@ final class RegisterManipulationSecondStepView: MNView, ViewCodeContract {
     // OBRIGATORIO
     private lazy var grossWeightLabel = MNLabel(text: "Peso bruto")
     private lazy var grossWeightTextField = CustomTextField(
-        titlePlaceholder: "Ex: 4,34 Kg",
+        titlePlaceholder: "ex: 4000g",
         radius: 10,
         borderColor: UIColor.opaqueSeparator.cgColor,
         borderWidth: 1
@@ -61,7 +66,7 @@ final class RegisterManipulationSecondStepView: MNView, ViewCodeContract {
     // OBRIGATORIO
     private lazy var cleanWeightLabel = MNLabel(text: "Peso limpo")
     private lazy var cleanWeightTextField = CustomTextField(
-        titlePlaceholder: "Ex: 3,50 Kg",
+        titlePlaceholder: "ex: 3000g",
         radius: 10,
         borderColor: UIColor.opaqueSeparator.cgColor,
         borderWidth: 1
@@ -74,7 +79,7 @@ final class RegisterManipulationSecondStepView: MNView, ViewCodeContract {
     // OPICIONAL
     private lazy var thawedWeightLabel = MNLabel(text: "Peso descongelado")
     private lazy var thawedWeightTextField = CustomTextField(
-        titlePlaceholder: "Ex: 4,00 Kg (opcional)",
+        titlePlaceholder: "ex: 4000g (opcional)",
         radius: 10,
         borderColor: UIColor.opaqueSeparator.cgColor,
         borderWidth: 1
@@ -87,7 +92,7 @@ final class RegisterManipulationSecondStepView: MNView, ViewCodeContract {
     // OPICIONAL
     private lazy var skinWeightLabel = MNLabel(text: "Peso da pele")
     private lazy var skinWeightTextField = CustomTextField(
-        titlePlaceholder: "Ex: 4,00 Kg (opcional)",
+        titlePlaceholder: "ex: 4000g (opcional)",
         radius: 10,
         borderColor: UIColor.opaqueSeparator.cgColor,
         borderWidth: 1
@@ -216,26 +221,34 @@ final class RegisterManipulationSecondStepView: MNView, ViewCodeContract {
     
 
     @objc func didTapContinueAction() {
-        
         let model = RegisterManipulationSecondStep(
-            grossWeight: grossWeightTextField.text.orEmpty,
-            cleanWeight: cleanWeightTextField.text.orEmpty,
-            thawedWeight: thawedWeightTextField.text.orEmpty,
-            skinWeight: skinWeightTextField.text.orEmpty
+            grossWeight: grossWeightValue,
+            cleanWeight: cleanWeightValue,
+            thawedWeight: thawedWeightValue,
+            skinWeight: skinWeightValue
         )
-        
         configureMandatoryTextInTextFields()
-        let isSomeEmptyField = isSomeEmptyField()
-        // let cleanWeightIsGreaterThanGross = cleanWeightIsGreaterThanGross()
-        
-        // let message = cleanWeightIsGreaterThanGross
-        //    ? "O peso limpo deve ser menor ou igual que o peso bruto."
-        //    : "Por favor, preencha os campos obrigatórios!"
-        
+
         let message = "Por favor, preencha os campos obrigatórios!"
-        
-        let isBlockFlow =  isSomeEmptyField // || cleanWeightIsGreaterThanGross
-        isBlockFlow ? showAlertAction(message) : didTapContinue(model)
+
+        let cleanWeight = cleanWeightValue.removingKgCharacter
+        let grossWeight = grossWeightValue.removingKgCharacter
+        let thawedWeight = thawedWeightValue.removingKgCharacter
+        let skinWeight = skinWeightValue.removingKgCharacter
+
+        if cleanWeight.compareFormattedWeights(grossWeight) == .orderedDescending {
+            return showAlertAction("O Peso limpo não pode ser maior que o bruto.")
+        }
+
+        if skinWeight.compareFormattedWeights(cleanWeight) == .orderedDescending {
+            return showAlertAction("O Peso da pele não pode ser maior que o limpo.")
+        }
+
+        if thawedWeight.compareFormattedWeights(grossWeight) == .orderedDescending {
+            return showAlertAction("O Peso descongelado não pode ser maior que o bruto.")
+        }
+
+        isSomeEmptyField() ? showAlertAction(message) : didTapContinue(model)
     }
 
     private func configureMandatoryTextInTextFields() {
@@ -251,15 +264,6 @@ final class RegisterManipulationSecondStepView: MNView, ViewCodeContract {
             }
         }
     }
-
-    public func formatWeight(weightInKgs: Double) -> String {
-        let mformatter = MeasurementFormatter()
-        mformatter.locale = Locale(identifier: "pt_BR")
-        mformatter.unitOptions = .naturalScale
-        mformatter.unitStyle = .medium
-        let weight = Measurement(value: weightInKgs, unit: UnitMass.grams)
-        return mformatter.string(from: weight)
-    }
 }
 
 extension RegisterManipulationSecondStepView: UITextFieldDelegate {
@@ -267,7 +271,12 @@ extension RegisterManipulationSecondStepView: UITextFieldDelegate {
         let maxLength: Int = 20
         let currentString = (textField.text.orEmpty) as NSString
         let newString = currentString.replacingCharacters(in: range, with: string)
-     
+
+        if textField == grossWeightTextField { grossWeightValue = newString }
+        if textField == cleanWeightTextField { cleanWeightValue = newString }
+        if textField == thawedWeightTextField { thawedWeightValue = newString }
+        if textField == skinWeightTextField { skinWeightValue = newString }
+
         return newString.count <= maxLength
     }
     
@@ -284,8 +293,7 @@ extension RegisterManipulationSecondStepView: UITextFieldDelegate {
     
     func textFieldDidEndEditing(_ textField: UITextField) {
         guard let text = textField.text else { return }
-        guard let doubleValue = Double(text) else { return }
-        textField.text = formatWeight(weightInKgs: doubleValue)
+        textField.text = text.formatWeight
         
 //        if textField == cleanWeightTextField {
 //            if cleanWeightIsGreaterThanGross() {
@@ -325,5 +333,33 @@ extension UITextField {
 
     @objc func textFieldDidChange(_ textField: UITextField) {
         if textField.text != nil { textField.text = "" }
+    }
+}
+
+extension String {
+
+    public func compareFormattedWeights(_ otherWeight: String) -> ComparisonResult {
+        guard let weight1 = self.numericValueFromFormattedWeight(),
+              let weight2 = otherWeight.numericValueFromFormattedWeight()
+        else {
+            return .orderedSame
+        }
+
+        if weight1 < weight2 {
+            return .orderedAscending
+        } else if weight1 > weight2 {
+            return .orderedDescending
+        } else {
+            return .orderedSame
+        }
+    }
+
+    private func numericValueFromFormattedWeight() -> Double? {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.locale = Locale(identifier: "pt_BR")
+        numberFormatter.numberStyle = .decimal
+
+        let sanitizedString = self.replacingOccurrences(of: ",", with: ".")
+        return numberFormatter.number(from: sanitizedString)?.doubleValue
     }
 }

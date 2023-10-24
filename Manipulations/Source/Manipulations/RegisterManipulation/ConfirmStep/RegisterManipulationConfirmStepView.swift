@@ -71,7 +71,7 @@ final class RegisterManipulationConfirmStepView: UIView {
     private lazy var discardWeightView = TitleAndValueView(title: "Peso descarte", showSeparator: false)
     
     private func bind(_ model: Manipulation) {
-        averageView.value = model.avarage
+        averageView.value = model.avarageDescription
         
         setIcon(ProductType(rawValue: model.productType) ?? .fish)
         productLabel.text = model.product
@@ -79,13 +79,13 @@ final class RegisterManipulationConfirmStepView: UIView {
         ownerView.value = model.responsibleName
         dateLabel.text = model.date
         
-        grossWeightView.value = model.grossWeight
-        cleanWeightView.value = model.cleanWeight
-        thawedWeightView.value = model.thawedWeight ?? "0 kg"
-        headlessWeightView.value = model.headlessWeight ?? "0 kg"
-        skinWeightView.value = model.skinWeight ?? "0 kg"
-        cookedWeightView.value = model.cookedWeight ?? "0 kg"
-        discardWeightView.value = model.discardWeight ?? "0 kg"
+        grossWeightView.value = model.grossWeight.description.formatWeight
+        cleanWeightView.value = model.cleanWeight.description.formatWeight
+        thawedWeightView.value = model.thawedWeight?.formatWeight ?? "-"
+        headlessWeightView.value = model.headlessWeight?.formatWeight ?? "-"
+        skinWeightView.value = model.skinWeight?.formatWeight ?? "-"
+        cookedWeightView.value = model.cookedWeight?.formatWeight ?? "-"
+        discardWeightView.value = model.discardWeight?.formatWeight ?? "-"
     }
     
     private(set) lazy var registerButton = CustomSubmitButton(

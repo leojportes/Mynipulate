@@ -36,7 +36,7 @@ final class ProfileViewController: CoordinatedViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        getNumberOfContributors()
+        getViewData()
     }
 
     override func loadView() {
@@ -46,7 +46,25 @@ final class ProfileViewController: CoordinatedViewController {
 
     // MARK: - Private methods
     private func didTapExitAccount() {
-        print("EXIT ACCOUNT")
+        viewModel.signOut { [weak self] result in
+            result
+                ? self?.showAlertToLogout()
+                : self?.showAlert(
+                    title: "Ocorreu um erro",
+                    message: "Tente novamente mais tarde"
+                )
+        }
+    }
+
+    private func showAlertToLogout() {
+        showAlert(
+            title: "Atenção!",
+            message: "Você realmente deseja sair da sua conta?",
+            leftButtonTitle: "Cancelar",
+            rightButtonTitle: "Sair"
+        ) {
+            self.viewModel.logout()
+        }
     }
 
     private func openContributor() {
@@ -54,15 +72,37 @@ final class ProfileViewController: CoordinatedViewController {
     }
 
     private func didTapContributorModeSwitch(_ isOn: Bool) {
-        MNUserDefaults.set(value: isOn, forKey: .contributorMode)
+        showAlertWithTextField(
+            okCompletion: weakify {
+                $0.viewModel.authLogin($1) { [weak self] onSuccess, error in
+                    onSuccess
+                        ? self?.setSwitch(isOn: isOn)
+                        : self?.showAlert(title: "Atenção", message: error)
+                }
+            },
+            cancelCompletion: weakify {
+                $0.rootView.contributorModeView.switchView.isOn.toggle()
+            }
+        )
     }
 
-    private func getNumberOfContributors() {
+    private func setSwitch(isOn: Bool) {
+        MNUserDefaults.set(value: isOn, forKey: .contributorMode)
+        viewModel.logout()
+    }
+
+    private func getViewData() {
         viewModel.input.viewDidLoad()
         viewModel.output.numberOfContributors.bind() { [weak self] result in
-            self?.rootView.setup(numberOfContributors: result.description)
+            let user = Current.shared.user
+            self?.rootView.setup(
+                model: .init(
+                    companyName: user.companyName,
+                    numberOfContributors: result.description,
+                    mananger: user.manangerName,
+                    documentNumber: user.document.format(mask: .brazilianDocument) ?? user.document
+                )
+            )
         }
     }
-    
 }
-

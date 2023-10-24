@@ -27,4 +27,5 @@ final class ProfileCoordinator: BaseCoordinator {
         configuration.navigationController?.viewControllers.removeAll()
         coordinator.start()
     }
+    
 }

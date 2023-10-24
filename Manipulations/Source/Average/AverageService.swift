@@ -16,8 +16,7 @@ class AverageService: AverageServiceProtocol {
 
     // Get contributor list
     func getContributorList(completion: @escaping ([Contributor]) -> Void) {
-        // guard let email = Auth.auth().currentUser?.email else { return }
-        let urlString = "http://192.168.0.2:3000/contributor/leojportes@gmail.com"
+        let urlString = "\(Current.shared.localhost):3000/contributor/\(Current.shared.email)"
         guard let url = URL(string: urlString) else { return }
         URLSession.shared.dataTask(with: url) { (data, response, error) in
             guard let data = data else { return }
@@ -36,8 +35,7 @@ class AverageService: AverageServiceProtocol {
 
     // Get procedure list
     func getProductList(completion: @escaping ([Product]) -> Void) {
-       // guard let email = Auth.auth().currentUser?.email else { return }
-        let urlString = "http://192.168.0.2:3000/product/leojportes@gmail.com"
+        let urlString = "\(Current.shared.localhost):3000/product/\(Current.shared.email)"
         guard let url = URL(string: urlString) else { return }
         URLSession.shared.dataTask(with: url) { (data, response, error) in
             guard let data = data else { return }

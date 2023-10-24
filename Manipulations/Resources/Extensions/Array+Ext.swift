@@ -57,3 +57,10 @@ public extension Array {
         !isEmpty
     }
 }
+
+extension Sequence {
+    func mapToVoid<T>() -> [T] {
+        return self.map({ $0 }) as? [T] ?? []
+    }
+}
+

@@ -15,7 +15,7 @@ final class ManipulationsDetailViewController: CoordinatedViewController {
         item: item,
         showAlertAction: weakify { $0.showAlert($1) },
         didTapEditAction: weakify { $0.openEditManipulation() },
-        didTapDeleteAction: weakify { $0.deleteManipulation() }
+        didTapDeleteAction: weakify { $0.deleteManipulation($1) }
     )
 
     // MARK: - Init
@@ -37,6 +37,7 @@ final class ManipulationsDetailViewController: CoordinatedViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .back
+        title = "Detalhes da manipulação"
     }
 
     override func loadView() {
@@ -56,7 +57,19 @@ final class ManipulationsDetailViewController: CoordinatedViewController {
         viewModel.openRegisterManipulation()
     }
 
-    private func deleteManipulation() {
-        // let item = item
+    private func deleteManipulation(_ manipulationId: String) {
+        self.showDeleteAlert(message: "Deseja deletar esta manipulação?\n Esta ação é irreversível.", closedScreen: true) {
+            self.viewModel.deleteManipulation(manipulationId) { message in
+                DispatchQueue.main.async { [weak self] in
+                    self?.showAlert(title: "", message: message) { [weak self] in
+                        DispatchQueue.main.async { [weak self] in
+                            self?.dismiss(animated: true) {
+                                self?.navigationController?.popToRootViewController(animated: true)
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

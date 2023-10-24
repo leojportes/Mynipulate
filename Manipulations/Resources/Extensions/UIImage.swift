@@ -18,6 +18,9 @@ extension UIImage {
         case discarts = "trash_ic"
         case institution = "institution"
         case alertWarning = "alertWarning"
+        case topOne = "top-one"
+        case topTwo = "top-two"
+        case topThree = "top-three"
     }
 
     static func icon(for icon: Icon) -> UIImage {

@@ -74,7 +74,12 @@ final class ManipulationsListViewController: CoordinatedViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // UIApplication.shared.statusBarStyle = .lightContent
+        rootView.tableView.reloadData()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        rootView.tableView.reloadData()
     }
 
     // MARK: - Private methods

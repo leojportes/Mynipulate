@@ -60,7 +60,7 @@ final class RegisterProductsViewController: CoordinatedViewController {
         }
         viewModel.registerProduct(
             product: RegisterProduct(
-                emailFirebase: "leojportes@gmail.com",
+                emailFirebase: Current.shared.email,
                 name: name,
                 type: type.iconTitle
             )

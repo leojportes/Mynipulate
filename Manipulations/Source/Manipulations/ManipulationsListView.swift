@@ -102,11 +102,7 @@ extension ManipulationsListView: ViewCodeContract, UITableViewDelegate, UITableV
     }
 
     func setupConstraints() {
-        baseView
-            .topAnchor(in: self)
-            .leftAnchor(in: self)
-            .rightAnchor(in: self)
-            .bottomAnchor(in: self, layoutOption: .useMargins)
+        baseView.pin(toEdgesOf: self)
         
         productsFilterView
             .topAnchor(in: baseView, padding: .medium)
@@ -126,10 +122,10 @@ extension ManipulationsListView: ViewCodeContract, UITableViewDelegate, UITableV
             .rightAnchor(in: baseView)
 
         tableView
-            .topAnchor(in: self, padding: .xLarge5 + 40)
+            .topAnchor(in: self, padding: .xLarge5 + .xLarge3)
             .leftAnchor(in: self)
             .rightAnchor(in: self)
-            .bottomAnchor(in: self)
+            .bottomAnchor(in: self, layoutOption: .useMargins)
     }
 
     override func layoutSubviews() {
@@ -159,7 +155,7 @@ extension ManipulationsListView: ViewCodeContract, UITableViewDelegate, UITableV
             cell.bind(
                 productTitle: item.product,
                 dateRange: item.date,
-                averagePorcent: item.avarage,
+                averagePorcent: item.avarageDescription,
                 responsible: item.responsibleName
             )
 

@@ -1,0 +1,17 @@
+Pods/
+**/.DS_Store
+Manipulations.xcworkspace/
+
+
+# Cocoapods
+Pods/*
+Podfile.lock
+Pods/Pods.xcodeproj/xcuserdata/*
+Pods/Pods.xcodeproj/xcuserdata/
+Manipulations/Pods/
+Pods/
+
+# Xcuserdata
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout

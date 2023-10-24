@@ -12,11 +12,12 @@ open class BaseCoordinator: Coordinator {
     public var parentCoordinator: BaseCoordinator?
     public var childCoordinators: [Coordinator] = []
     public var configuration: CoordinatorConfiguration
-    
     public let id = UUID().uuidString
     
-    public required init(with configuration: CoordinatorConfiguration,
-                         parentCoordinator: BaseCoordinator? = nil) {
+    public required init(
+        with configuration: CoordinatorConfiguration,
+        parentCoordinator: BaseCoordinator? = nil
+    ) {
         self.configuration = configuration
         self.parentCoordinator = parentCoordinator
         self.parentCoordinator?.insertChild(childCoordinator: self)

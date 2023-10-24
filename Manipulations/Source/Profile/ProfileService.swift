@@ -6,31 +6,28 @@
 //
 
 import Foundation
-
-import Foundation
+import UIKit
 
 protocol ProfileServiceProtocol {
     func getContributorList(completion: @escaping ([Contributor]) -> Void)
 }
 
 class ProfileService: ProfileServiceProtocol {
-    // Get contributor list
+    private let apiClient = APIClient()
+
     func getContributorList(completion: @escaping ([Contributor]) -> Void) {
-        // guard let email = Auth.auth().currentUser?.email else { return }
-        let urlString = "http://192.168.0.2:3000/contributor/leojportes@gmail.com"
-        guard let url = URL(string: urlString) else { return }
-        URLSession.shared.dataTask(with: url) { (data, response, error) in
-            guard let data = data else { return }
-            do {
-                let result = try JSONDecoder().decode([Contributor].self, from: data)
-                DispatchQueue.main.async {
-                    completion(result)
-                }
-            }
-            catch {
-                let error = error
+        let endpoint = "\(Current.shared.localhost):3000/contributor/\(Current.shared.email)"
+        apiClient.performRequest(
+            method: .get,
+            endpoint: endpoint
+        ) { (result: Result<[Contributor], Error>) in
+            switch result {
+            case .success(let contributors):
+                completion(contributors)
+            case .failure(let error):
+                // Lide com o erro
                 print(error)
             }
-        }.resume()
+        }
     }
 }

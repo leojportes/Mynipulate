@@ -14,7 +14,8 @@ final class ContributorsViewController: CoordinatedViewController {
     private var contributors: [Contributor] = []
 
     private lazy var rootView = ContributorsView(
-        didTapDelete: weakify { $0.didTapDelete(contributor: $1) }
+        didTapDelete: weakify { $0.didTapDelete(contributor: $1) },
+        showAlert: weakify { $0.showAlert() }
     )
 
     // MARK: - Init
@@ -83,5 +84,12 @@ final class ContributorsViewController: CoordinatedViewController {
 
     private func dismiss() {
         self.dismiss(animated: true)
+    }
+
+    private func showAlert() {
+        showAlert(
+            title: "Oops!",
+            message: "A função deletar não está disponível no modo colaborador.\nEntre em Perfil para alterar."
+        )
     }
 }

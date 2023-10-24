@@ -8,7 +8,6 @@
 import UIKit
 
 final class ProfileView: UIView, ViewCodeContract {
-    
     private let didTapExitAccountClosure: Action
     private let didTapContributorClosure: Action
     private let didTapContributorModeSwitch: (Bool) -> Void
@@ -34,24 +33,24 @@ final class ProfileView: UIView, ViewCodeContract {
     }
 
     private lazy var institutionLabel = MNLabel(
-        text: "Nome da empresa S.A.",
+        text: "",
         font: .boldSystemFont(ofSize: 18),
         textColor: .neutralHigh
     )
 
     private lazy var documentView = TitleAndValueView(
         title: "Documento",
-        value: "085.334.434/0001-33"
+        value: ""
     )
 
     private lazy var contributorCountView = TitleAndValueView(
         title: "N.º de colaboradores",
-        value: "5"
+        value: ""
     )
     
     private lazy var manangerView = TitleAndValueView(
         title: "Responsável geral",
-        value: "Rafael Portes",
+        value: "",
         showSeparator: false
     )
     
@@ -79,7 +78,7 @@ final class ProfileView: UIView, ViewCodeContract {
         $0.backgroundColor = .white
     }
 
-    private lazy var contributorModeView = ContributorsBlockView(
+    lazy var contributorModeView = ContributorsBlockView(
         isSelected: weakify { $0.didTapContributorModeSwitch($1) },
         isOn: MNUserDefaults.get(boolForKey: .contributorMode) ?? true
     )
@@ -164,58 +163,11 @@ final class ProfileView: UIView, ViewCodeContract {
     }
 
     func setup(
-        numberOfContributors: String
+        model: ProfileViewData
     ) {
-        contributorCountView.value = numberOfContributors
+        contributorCountView.value = model.numberOfContributors
+        institutionLabel.text = model.companyName
+        manangerView.value = model.mananger
+        documentView.value = model.documentNumber
     }
-}
-
-final class ContributorsBlockView: CardView, ViewCodeContract {
-    
-    private let isSelected: (Bool) -> Void
-    private let isOn: Bool
-    
-    // MARK: - Init
-    init(
-        isSelected: @escaping (Bool) -> Void,
-        isOn: Bool
-    ) {
-        self.isSelected = isSelected
-        self.isOn = isOn
-        super.init()
-        setupView()
-        backgroundColor = .white
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    private lazy var titleLabel = MNLabel(text: "Modo colaborador")
-    
-    private lazy var switchView = UISwitch() .. {
-        $0.translatesAutoresizingMaskIntoConstraints = false
-        $0.isOn = self.isOn
-    }
-    
-    func setupHierarchy() {
-        addSubview(titleLabel)
-        addSubview(switchView)
-    }
-    
-    func setupConstraints() {
-        switchView.addTarget(self, action: #selector(setSelection), for: .valueChanged)
-        titleLabel
-            .centerY(in: self)
-            .leftAnchor(in: self, padding: .medium)
-        
-        switchView
-            .centerY(in: self)
-            .rightAnchor(in: self, padding: .medium)
-    }
-
-    @objc func setSelection(_ sender: UISwitch) {
-        isSelected(sender.isOn)
-    }
-
 }

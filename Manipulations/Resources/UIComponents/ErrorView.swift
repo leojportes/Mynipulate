@@ -35,6 +35,7 @@ class ErrorView: UIView {
         let img = UIImageView()
         img.translatesAutoresizingMaskIntoConstraints = false
         img.contentMode = .scaleAspectFit
+        img.setImageColor(color: .misteryGreen)
         return img
     }()
     

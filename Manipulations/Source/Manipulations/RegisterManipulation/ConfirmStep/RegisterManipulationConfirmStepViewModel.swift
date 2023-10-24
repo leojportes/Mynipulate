@@ -22,7 +22,7 @@ class RegisterManipulationConfirmStepViewModel: RegisterManipulationConfirmStepV
     }
 
     func registerManipulation(manipulation: Manipulation, completion: @escaping (Bool) -> Void) {
-        guard let url = URL(string: "http://192.168.0.2:3000/manipulation") else {
+        guard let url = URL(string: "\(Current.shared.localhost):3000/manipulation") else {
             print("Error: cannot create URL")
             return
         }

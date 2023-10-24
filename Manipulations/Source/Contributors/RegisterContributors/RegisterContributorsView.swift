@@ -122,7 +122,7 @@ final class RegisterContributorsView: MNView, ViewCodeContract {
 
     private func register() {
         let model = RegisterContributor(
-            emailFirebase: "leojportes@gmail.com",
+            emailFirebase: Current.shared.email,
             documentBusiness: "Current.session.document",
             name: nameTextField.text.orEmpty,
             id: idTextField.text.orEmpty

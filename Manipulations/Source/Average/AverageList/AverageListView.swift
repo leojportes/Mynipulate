@@ -52,6 +52,10 @@ final class AverageListView: UIView {
             AverageByCollaboratorTableViewCell.self,
             forCellReuseIdentifier: AverageByCollaboratorTableViewCell.identifier
         )
+        $0.register(
+            EmptyListViewCell.self,
+            forCellReuseIdentifier: EmptyListViewCell.identifier
+        )
     }
     
     init(
@@ -121,20 +125,28 @@ extension AverageListView: ViewCodeContract, UITableViewDelegate, UITableViewDat
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        manipulations.count
+        if manipulations.isEmpty { return 1 }
+        return manipulations.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if manipulations.isEmpty {
+            let cell = tableView.dequeueReusableCell(withIdentifier: EmptyListViewCell.identifier, for: indexPath) as? EmptyListViewCell
+            cell?.isUserInteractionEnabled = false
+            cell?.bind(title: "Oops!", subtitle: "Nenhuma manipulação cadastrada neste período.\nCadastre em Manipulações.")
+            return cell ?? UITableViewCell()
+        }
+
         let item = manipulations[indexPath.row]
         if averageType == .byProduct {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: AverageByProductTableViewCell.identifier, for: indexPath) as? AverageByProductTableViewCell else { return UITableViewCell() }
-
+            let date = item.date == "" ? "Todos os anos" : String(item.date.suffix(4))
             cell.bind(
                 productTitle: item.product,
-                dateRange: item.date,
-                averagePorcent: item.avarage,
-                grossWeight: item.grossWeight,
-                cleanWeight: item.cleanWeight
+                dateRange: date,
+                averagePorcent: item.avarageDescription,
+                grossWeight: item.grossWeight.description,
+                cleanWeight: item.cleanWeight.description
             )
             return cell
         }
@@ -143,9 +155,8 @@ extension AverageListView: ViewCodeContract, UITableViewDelegate, UITableViewDat
 
         cell.bind(
             contributor: item.responsibleName,
-            dateRange: item.date,
-            averagePorcent: item.avarage,
-            productName: item.product
+            dateRange: String(item.date.suffix(4)),
+            averagePorcent: item.avarageDescription
         )
 
         return cell
@@ -160,7 +171,11 @@ extension AverageListView: ViewCodeContract, UITableViewDelegate, UITableViewDat
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        averageType == .byProduct ? 190 : 155
+        let productCellHeight = CGFloat(190)
+        let contributorCellHeight = CGFloat(120)
+        return averageType == .byProduct
+            ? productCellHeight
+            : contributorCellHeight
     }
 
 }

@@ -9,6 +9,7 @@ import UIKit
 
 final class ContributorsView: UIView, ViewCodeContract {
     private let didTapDelete: (String) -> Void
+    private let showAlert: () -> Void
     
     var contributors: [Contributor] = [] {
         didSet {
@@ -17,8 +18,9 @@ final class ContributorsView: UIView, ViewCodeContract {
     }
 
     // MARK: - Init
-    init(didTapDelete: @escaping (String) -> Void) {
+    init(didTapDelete: @escaping (String) -> Void, showAlert: @escaping () -> Void) {
         self.didTapDelete = didTapDelete
+        self.showAlert = showAlert
         super.init(frame: .zero)
         setupView()
         backgroundColor = .back
@@ -38,6 +40,7 @@ final class ContributorsView: UIView, ViewCodeContract {
             ContributorsTableViewCell.self,
             forCellReuseIdentifier: ContributorsTableViewCell.identifier
         )
+        $0.register(EmptyListViewCell.self, forCellReuseIdentifier: EmptyListViewCell.identifier)
     }
 
     // MARK: - Methods
@@ -54,25 +57,37 @@ final class ContributorsView: UIView, ViewCodeContract {
 
 extension ContributorsView: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return contributors.count
+        return  contributors.isEmpty ? 1 : contributors.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView
-            .dequeueReusableCell(
-                withIdentifier: ContributorsTableViewCell.identifier,
-                for: indexPath
-            ) as? ContributorsTableViewCell else { return UITableViewCell() }
-        let item = contributors[indexPath.row]
-        cell.bind(title: item.name, id: item.id)
-        return cell
+        if contributors.isEmpty && indexPath.row == 0 {
+            guard let cell = tableView
+                .dequeueReusableCell(
+                    withIdentifier: EmptyListViewCell.identifier,
+                    for: indexPath
+                ) as? EmptyListViewCell else { return UITableViewCell() }
+            cell.separatorInset = .zero
+            cell.bind(title: "Nenhum colaborador cadastrado!", subtitle: "Cadastre um novo colaborador no ícone +")
+            return cell
+        } else {
+            guard let cell = tableView
+                .dequeueReusableCell(
+                    withIdentifier: ContributorsTableViewCell.identifier,
+                    for: indexPath
+                ) as? ContributorsTableViewCell else { return UITableViewCell() }
+            let item = contributors[indexPath.row]
+            cell.bind(title: item.name, id: item.id)
+            return cell
+        }
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        70
+        contributors.isEmpty && indexPath.row == 0 ? 0 : 70
     }
 
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if Current.shared.isContributorMode { return showAlert() }
         if editingStyle == .delete {
             didTapDelete(contributors[indexPath.row]._id)
           //  products.remove(at: indexPath.row)

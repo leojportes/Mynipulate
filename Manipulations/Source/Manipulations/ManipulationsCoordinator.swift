@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-final class ManipulationsCoordinator: BaseCoordinator {
+class ManipulationsCoordinator: BaseCoordinator {
     func start(products: [Product], contributors: [Contributor]) {
         let viewModel = ManipulationsListViewModel(coordinator: self)
         let controller = ManipulationsListViewController(

@@ -28,7 +28,7 @@ class RegisterProductsViewModel: RegisterProductsViewModelProtocol {
     }
 
     func registerProduct(product: RegisterProduct, completion: @escaping (Bool) -> Void) {
-        guard let url = URL(string: "http://192.168.0.2:3000/product") else {
+        guard let url = URL(string: "\(Current.shared.localhost):3000/product") else {
             print("Error: cannot create URL")
             return
         }

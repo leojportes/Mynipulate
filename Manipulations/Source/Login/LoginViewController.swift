@@ -7,6 +7,7 @@
 
 import UIKit
 import AVFoundation
+import FirebaseAuth
 
 final class LoginViewController: CoordinatedViewController {
 
@@ -15,10 +16,16 @@ final class LoginViewController: CoordinatedViewController {
     private var player: AVPlayer?
     private var playerLayer: AVPlayerLayer?
     private var isSecureTextEntry: Bool = false
+    private let didRegisterAccount: () -> Void?
 
     // MARK: - Init
-    init(viewModel: LoginViewModel, coordinator: CoordinatorProtocol) {
+    init(
+        viewModel: LoginViewModel,
+        coordinator: CoordinatorProtocol,
+        didRegisterAccount: @escaping () -> Void
+    ) {
         self.viewModel = viewModel
+        self.didRegisterAccount = didRegisterAccount
         super.init(coordinator: coordinator)
     }
 
@@ -35,15 +42,22 @@ final class LoginViewController: CoordinatedViewController {
         setupBackgroundVideo()
 
         buttonContainerView.backgroundColor = .clear
-        buttonContainerView.addSubview(loginButton)
-        loginButton.translatesAutoresizingMaskIntoConstraints = false
-        loginButton.centerX(in: buttonContainerView)
-        loginButton.leftAnchor(in: buttonContainerView, padding: .medium)
-        loginButton.rightAnchor(in: buttonContainerView, padding: .medium)
-        loginButton.bottomAnchor(in: buttonContainerView, padding: .medium)
-        loginButton.heightAnchor(50)
-        
+        buttonContainerView.addSubview(loginKeyboardButton)
+        loginKeyboardButton.translatesAutoresizingMaskIntoConstraints = false
+        loginKeyboardButton.centerX(in: buttonContainerView)
+        loginKeyboardButton.leftAnchor(in: buttonContainerView, padding: .medium)
+        loginKeyboardButton.rightAnchor(in: buttonContainerView, padding: .medium)
+        loginKeyboardButton.bottomAnchor(in: buttonContainerView, padding: .medium)
+        loginKeyboardButton.heightAnchor(50)
+
         baseView.backgroundColor = .blackHigh.withAlphaComponent(0.4)
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+//        if Auth.auth().currentUser != nil && viewModel.isInternetAvailable() {
+//            viewModel.navigateToHome()
+//        }
     }
 
     @objc func playerDidReachEnd() {
@@ -69,19 +83,10 @@ final class LoginViewController: CoordinatedViewController {
         button.addTarget(self, action: #selector(handleEyeButton), for: .touchUpInside)
         return button
     }()
-    
-    private lazy var myBusinessImage: UIImageView = {
-        let img = UIImageView()
-        img.heightAnchor(36)
-        img.widthAnchor(36)
-        img.image = UIImage(named: Icon.iconApp.rawValue)
-        img.translatesAutoresizingMaskIntoConstraints = false
-        return img
-    }()
-    
+
     private lazy var titleLabel: MNLabel = {
         let label = MNLabel(
-            text: "MYNIPULE",
+            text: "MANIPULE",
             font: UIFont.boldSystemFont(ofSize: 28),
             textColor: .back
         )
@@ -103,9 +108,12 @@ final class LoginViewController: CoordinatedViewController {
         )
         textField.backgroundColor = .neutralHigh.withAlphaComponent(0.5)
         textField.autocapitalizationType = .none
+        textField.autocorrectionType = .no
         textField.clearButtonMode = .whileEditing
         textField.inputAccessoryView = buttonContainerView
         textField.addTarget(self, action: #selector(textFieldEditingDidChange), for: .editingChanged)
+        textField.addTarget(self, action: #selector(didBeginEditingTF), for: .editingDidBegin)
+        textField.addTarget(self, action: #selector(didEndEditingTF), for: .editingDidEnd)
         return textField
     }()
 
@@ -122,10 +130,25 @@ final class LoginViewController: CoordinatedViewController {
         textField.backgroundColor = .neutralHigh.withAlphaComponent(0.5)
         textField.autocapitalizationType = .none
         textField.addTarget(self, action: #selector(textFieldEditingDidChange), for: .editingChanged)
+        textField.addTarget(self, action: #selector(didBeginEditingTF), for: .editingDidBegin)
+        textField.addTarget(self, action: #selector(didEndEditingTF), for: .editingDidEnd)
         textField.inputAccessoryView = buttonContainerView
         return textField
     }()
     
+    private lazy var loginKeyboardButton: CustomSubmitButton = {
+        let button = CustomSubmitButton(
+            title: "Entrar",
+            colorTitle: .neutralHigh,
+            radius: 25,
+            background: .white.withAlphaComponent(0.7),
+            borderColorCustom: UIColor.white.cgColor,
+            borderWidthCustom: 1
+        )
+        button.addTarget(self, action: #selector(didTapLoginButton), for: .touchUpInside)
+        return button
+    }()
+
     private lazy var loginButton: CustomSubmitButton = {
         let button = CustomSubmitButton(
             title: "Entrar",
@@ -135,7 +158,7 @@ final class LoginViewController: CoordinatedViewController {
             borderColorCustom: UIColor.white.cgColor,
             borderWidthCustom: 1
         )
-//        button.addTarget(self, action: #selector(handleLoginButton), for: .touchUpInside)
+        button.addTarget(self, action: #selector(didTapLoginButton), for: .touchUpInside)
         return button
     }()
     
@@ -184,18 +207,93 @@ final class LoginViewController: CoordinatedViewController {
             title: "Registre-se",
             colorTitle: .systemGray
         )
-//        button.addTarget(self, action: #selector(handlerRegisterButton), for: .touchUpInside)
+        button.addTarget(self, action: #selector(didTapRegisterAccount), for: .touchUpInside)
         return button
     }()
-    
+
     private func isEnabledButtonLogin(_ isEnabled: Bool) {
-        if isEnabled {
-            loginButton.backgroundColor = .purpleLight
-            loginButton.isEnabled = true
-        } else {
-            loginButton.backgroundColor = .systemGray
-            loginButton.isEnabled = false
+        loginKeyboardButton.isEnabled = isEnabled
+        loginButton.isEnabled = isEnabled
+    }
+
+    @objc func didTapLoginButton(_ sender: UIButton) {
+        guard let email = emailTextField.text else { return }
+        guard let password = passwordTextField.text else { return }
+        let isInvalidPasswordFormat = (password.count > 7).not
+        let invalidEmailFormat = email.isValidEmail().not
+
+        if isInvalidPasswordFormat && invalidEmailFormat {
+            return showAlert(title: "Oops!", message: "E-mail e senha com formato inválido.\nPor favor, digite um e-mail válido e senha com 7 ou mais caracteres.")
         }
+
+        if invalidEmailFormat {
+            return showAlert(title: "Oops!", message: "E-mail com formato inválido.\nPor favor, digite um e-mail válido.")
+        }
+
+        if isInvalidPasswordFormat {
+            return showAlert(title: "Oops!", message: "A senha deve ter mais que 7 caracteres.")
+        }
+
+        if invalidEmailFormat.not && isInvalidPasswordFormat.not {
+            if sender == loginButton {
+                loginButton.loadingIndicator(show: true)
+            } else {
+                loginKeyboardButton.loadingIndicator(show: true)
+            }
+            didTapLogin()
+        }
+
+    }
+
+    // MARK: - Actions methods
+
+    private func didTapLogin() {
+        viewModel.authLogin(emailTextField.text.orEmpty, passwordTextField.text.orEmpty) { [weak self] onSuccess, descriptionError in
+            onSuccess
+                ? self?.checkNewUser()
+                : self?.showError(descriptionError)
+        }
+    }
+
+    private func showError( _ descriptionError: String) {
+        showAlert(title: "Atenção", message: descriptionError)
+        loginButton.loadingIndicator(show: false)
+        loginKeyboardButton.loadingIndicator(show: false)
+    }
+
+    private func checkNewUser() {
+        if Current.shared.isEmailVerified.not {
+            DispatchQueue.main.async {
+                self.viewModel.navigateToCheckYourAccount()
+            }
+            return
+        }
+        self.loginButton.loadingIndicator(show: false)
+        self.loginKeyboardButton.loadingIndicator(show: false)
+        viewModel.fetchUser { [weak self] result in
+            DispatchQueue.main.async {
+                if result.isEmpty {
+                    self?.viewModel.navigateToUserOnboarding()
+                } else {
+                    guard let email = Auth.auth().currentUser?.email else { return }
+                    MNUserDefaults.set(model: result.first, forKey: .currentUser)
+                    MNUserDefaults.set(value: true, forString: email)
+                    self?.viewModel.navigateToHome()
+                }
+            }
+        }
+    }
+
+    @objc func didTapRegisterAccount() {
+        didRegisterAccount()
+    }
+
+    @objc func didBeginEditingTF(_ sender: UITextField) {
+        loginButton.isHidden = true
+    }
+
+    @objc func didEndEditingTF(_ sender: UITextField) {
+        loginButton.isHidden = false
     }
 
     func setupBackgroundVideo() {
@@ -230,9 +328,10 @@ extension LoginViewController {
     @objc private func textFieldEditingDidChange() {
         guard let email = emailTextField.text else { return }
         guard let password = passwordTextField.text else { return }
-        let isValidLogin = email.isValidEmail() && password.count >= 7
-        isValidLogin ? isEnabledButtonLogin(true) : isEnabledButtonLogin(false)
-//        didEditingTextField(email)
+        let isValidLogin = email.isValidEmail() && password.count > 7
+
+        isEnabledButtonLogin(isValidLogin)
+
     }
         
     @objc
@@ -254,6 +353,7 @@ extension LoginViewController {
         baseView.addSubview(emailTextField)
         baseView.addSubview(passwordTextField)
         baseView.addSubview(eyeButton)
+        baseView.addSubview(loginKeyboardButton)
         baseView.addSubview(loginButton)
         baseView.addSubview(forgotPasswordStackView)
         baseView.addSubview(registerStackView)
@@ -286,12 +386,12 @@ extension LoginViewController {
             .rightAnchor(in: passwordTextField)
             .widthAnchor(48)
             .heightAnchor(48)
-//
-//        loginButton
-//            .topAnchor(in: passwordTextField, attribute: .bottom, padding: 100)
-//            .leftAnchor(in: baseView, attribute: .left, padding: 16)
-//            .rightAnchor(in: baseView, attribute: .right, padding: 16)
-//            .heightAnchor(48)
+
+        loginButton
+            .topAnchor(in: passwordTextField, attribute: .bottom, padding: 100)
+            .leftAnchor(in: baseView, attribute: .left, padding: 16)
+            .rightAnchor(in: baseView, attribute: .right, padding: 16)
+            .heightAnchor(48)
 
         forgotPasswordStackView
             .topAnchor(in: loginButton, attribute: .bottom, padding: 14)

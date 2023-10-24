@@ -14,64 +14,56 @@ protocol HomeServiceProtocol {
 }
 
 class HomeService: HomeServiceProtocol {
+    private let apiClient = APIClient()
 
+    /// Get product list
     func getProductList(completion: @escaping ([Product]) -> Void) {
-       // guard let email = Auth.auth().currentUser?.email else { return }
-        
-        let urlString = "http://192.168.0.2:3000/product/leojportes@gmail.com"
-        guard let url = URL(string: urlString) else { return }
-        URLSession.shared.dataTask(with: url) { (data, response, error) in
-            guard let data = data else { return }
-            do {
-                let result = try JSONDecoder().decode([Product].self, from: data)
-                DispatchQueue.main.async {
-                    completion(result)
-                }
-            }
-            catch {
-                let error = error
+        let endpoint = "\(Current.shared.localhost):3000/product/\(Current.shared.email)"
+        apiClient.performRequest(
+            method: .get,
+            endpoint: endpoint
+        ) { (result: Result<[Product], Error>) in
+            switch result {
+            case .success(let products):
+                completion(products)
+            case .failure(let error):
+                // Lide com o erro
                 print(error)
             }
-        }.resume()
+        }
     }
 
-    // Get contributor list
+    /// Get contributor list
     func getContributorList(completion: @escaping ([Contributor]) -> Void) {
-        // guard let email = Auth.auth().currentUser?.email else { return }
-        let urlString = "http://192.168.0.2:3000/contributor/leojportes@gmail.com"
-        guard let url = URL(string: urlString) else { return }
-        URLSession.shared.dataTask(with: url) { (data, response, error) in
-            guard let data = data else { return }
-            do {
-                let result = try JSONDecoder().decode([Contributor].self, from: data)
-                DispatchQueue.main.async {
-                    completion(result)
-                }
-            }
-            catch {
-                let error = error
+        let endpoint = "\(Current.shared.localhost):3000/contributor/\(Current.shared.email)"
+        apiClient.performRequest(
+            method: .get,
+            endpoint: endpoint
+        ) { (result: Result<[Contributor], Error>) in
+            switch result {
+            case .success(let contributors):
+                completion(contributors)
+            case .failure(let error):
+                // Lide com o erro
                 print(error)
             }
-        }.resume()
+        }
     }
 
+    /// Get manipulation list
     func getManipulationList(completion: @escaping ([Manipulation]) -> Void) {
-       // guard let email = Auth.auth().currentUser?.email else { return }
-
-        let urlString = "http://192.168.0.2:3000/manipulation/leojportes@gmail.com"
-        guard let url = URL(string: urlString) else { return }
-        URLSession.shared.dataTask(with: url) { (data, response, error) in
-            guard let data = data else { return }
-            do {
-                let result = try JSONDecoder().decode([Manipulation].self, from: data)
-                DispatchQueue.main.async {
-                    completion(result)
-                }
-            }
-            catch {
-                let error = error
+        let endpoint = "\(Current.shared.localhost):3000/manipulation/\(Current.shared.email)"
+        apiClient.performRequest(
+            method: .get,
+            endpoint: endpoint
+        ) { (result: Result<[Manipulation], Error>) in
+            switch result {
+            case .success(let manipulations):
+                completion(manipulations)
+            case .failure(let error):
+                // Lide com o erro
                 print(error)
             }
-        }.resume()
+        }
     }
 }

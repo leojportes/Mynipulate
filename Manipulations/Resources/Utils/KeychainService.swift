@@ -9,9 +9,9 @@ import Foundation
 
 // Constant Identifiers
 struct KeychainIdentifiers {
-    static let emailKey = "MeuNegocioEmail"
+    static let emailKey = "ManipulationsEmail"
     static let accessGroup = "SecuritySerivice"
-    static let passwordKey = "MeuNegocioPassword"
+    static let passwordKey = "ManipulationsPassword"
 }
 
 let describe: String = "Nothing was retrieved from the keychain. Status code"

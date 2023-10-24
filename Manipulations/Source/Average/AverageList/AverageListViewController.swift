@@ -11,12 +11,11 @@ final class AverageListViewController: CoordinatedViewController {
 
     private lazy var dateFiltered: String = "Todos"
     private lazy var productFiltered: String = "Todos"
-    private lazy var contributorFiltered: String = "Todos"
 
     private var averageType: UseAveragesType
     private let contributors: [Contributor]
     private let products: [Product]
-    private let manipulations: [Manipulation]
+    private var manipulations: [Manipulation]
 
     private lazy var rootView = AverageListView(
         averageType: averageType,
@@ -41,7 +40,11 @@ final class AverageListViewController: CoordinatedViewController {
         self.contributors = contributors
         self.manipulations = manipulations
         super.init(coordinator: coordinator)
+        configureInitialList()
+    }
 
+    private func configureInitialList() {
+        didFilterProduct(.all)
     }
 
     required public init?(coder: NSCoder) {
@@ -65,67 +68,135 @@ final class AverageListViewController: CoordinatedViewController {
         case .all:
             dateFiltered = item.rawValue
             rootView.manipulations = averageType == .byProduct
-                ? filteredManipulations(manipulations, item.rawValue, productFiltered)
-                : filteredManipulationsForContributor(manipulations, item.rawValue)
+            ? filteredManipulations(manipulations, item.rawValue, productFiltered)
+            : filteredManipulationsForContributor(manipulations, item.rawValue)
+
         case .custom: print("custom")
+
         default:
             dateFiltered = item.rawValue
             rootView.manipulations = averageType == .byProduct
-                ? filteredManipulations(manipulations, item.rawValue, productFiltered)
-                : filteredManipulationsForContributor(manipulations, item.rawValue)
+            ? filteredManipulations(manipulations, item.rawValue, productFiltered)
+            : filteredManipulationsForContributor(manipulations, item.rawValue)
         }
     }
 
     private func filteredManipulations(
-            _ manipulations: [Manipulation],
-            _ date: String? = nil,
-            _ productFiltered: String? = nil
-    ) -> [Manipulation] {
-        let all = "Todos"
-        let hasFilterAndNotAll = productFiltered != nil && date != nil && productFiltered != all && date != all
-        let hasProductFilterAndNotAll = productFiltered != nil && productFiltered != all
-        let AllProductFilterAndHasSomeFilterDate = productFiltered == all && date != nil
-
-        if productFiltered == all && date == all {
-            return manipulations
-        }
-
-        if hasFilterAndNotAll {
-            return manipulations.filter({ $0.date.contains(date.orEmpty) && $0.product == productFiltered })
-        }
-
-        if hasProductFilterAndNotAll {
-            return manipulations.filter({ $0.product == productFiltered })
-        }
-
-        if AllProductFilterAndHasSomeFilterDate {
-           return manipulations.filter({ $0.date.contains(date.orEmpty) })
-        }
-
-        return manipulations.filter({ $0.date.contains(date.orEmpty) })
-    }
-
-    private func filteredManipulationsForContributor(
-            _ manipulations: [Manipulation],
-            _ date: String? = nil
+        _ manipulations: [Manipulation],
+        _ date: String? = nil,
+        _ productFiltered: String? = nil
     ) -> [Manipulation] {
         let all = "Todos"
         let hasFilterAndNotAll = date != nil && date != all
-        let dateIsNotNil = date != nil
+        var mergedByDateManipulations: [Manipulation] = []
+        var mergedAllManipulations: [Manipulation] = []
+
+        let groupedManipulationsByDate = Dictionary(grouping: manipulations) {
+            GroupedProductByDate(product: $0.product, date: String($0.date.suffix(4)))
+        }
+
+        let groupedAllManipulations = Dictionary(grouping: manipulations) {
+            GroupedProduct(product: $0.product)
+        }
+
+        for (_, manipulations) in groupedManipulationsByDate {
+            var mergedManipulation = manipulations[0]
+            for i in 1..<manipulations.count {
+                mergedManipulation.grossWeight += manipulations[i].grossWeight
+                mergedManipulation.cleanWeight += manipulations[i].cleanWeight
+            }
+            mergedByDateManipulations.append(mergedManipulation)
+        }
+
+        for (_, manipulations) in groupedAllManipulations {
+            var mergedManipulation = manipulations[0]
+            for i in 1..<manipulations.count {
+                mergedManipulation.grossWeight += manipulations[i].grossWeight
+                mergedManipulation.cleanWeight += manipulations[i].cleanWeight
+            }
+            mergedAllManipulations.append(
+                .init(
+                    product: mergedManipulation.product,
+                    date: "",
+                    responsibleName: mergedManipulation.responsibleName,
+                    grossWeight: mergedManipulation.grossWeight,
+                    cleanWeight: mergedManipulation.cleanWeight
+                )
+            )
+        }
 
         if date == all {
-            return manipulations
+            return mergedAllManipulations.sorted(by: { $0.product < $1.product })
         }
 
         if hasFilterAndNotAll {
-
-            let item = manipulations.filter { $0.responsibleName == $0.responsibleName && $0.date.contains(date.orEmpty) }
-
-            return manipulations.filter({ $0.date.contains(date.orEmpty) })
-
+            return mergedByDateManipulations
+                .filter({ $0.date.contains(date.orEmpty) })
+                .sorted(by: { $0.product < $1.product })
         }
 
-        return manipulations.filter({ $0.date.contains(date.orEmpty) })
+        return mergedByDateManipulations
+            .filter({ $0.date.contains(date.orEmpty) })
+            .sorted(by: { $0.product < $1.product })
+    }
+
+    private func filteredManipulationsForContributor(
+        _ manipulations: [Manipulation],
+        _ date: String? = nil
+    ) -> [Manipulation] {
+        let all = "Todos"
+        let hasFilterAndNotAll = date != nil && date != all
+        var mergedByDateManipulations: [Manipulation] = []
+        var mergedAllManipulations: [Manipulation] = []
+
+        let groupedManipulations = Dictionary(grouping: manipulations) {
+            GroupedByDateContributorsManipulations(responsibleName: $0.responsibleName, date: String($0.date.suffix(4)))
+        }
+
+        let groupedAllManipulations = Dictionary(grouping: manipulations) {
+            GroupedByContributorsManipulations(responsibleName: $0.responsibleName)
+        }
+
+        for (_, manipulations) in groupedManipulations {
+            var mergedManipulation = manipulations[0]
+            for i in 1..<manipulations.count {
+                mergedManipulation.grossWeight += manipulations[i].grossWeight
+                mergedManipulation.cleanWeight += manipulations[i].cleanWeight
+            }
+            mergedByDateManipulations.append(mergedManipulation)
+        }
+
+        for (_, manipulations) in groupedAllManipulations {
+            var mergedManipulation = manipulations[0]
+
+            for i in 1..<manipulations.count {
+                mergedManipulation.grossWeight += manipulations[i].grossWeight
+                mergedManipulation.cleanWeight += manipulations[i].cleanWeight
+            }
+            mergedAllManipulations.append(
+                .init(
+                    product: mergedManipulation.product,
+                    date: "",
+                    responsibleName: mergedManipulation.responsibleName,
+                    grossWeight: mergedManipulation.grossWeight,
+                    cleanWeight: mergedManipulation.cleanWeight
+                )
+            )
+        }
+
+        if date == all {
+            return mergedAllManipulations.sorted(by: { $0.responsibleName < $1.responsibleName })
+        }
+
+        if hasFilterAndNotAll {
+            return mergedByDateManipulations
+                .filter({ $0.date.contains(date.orEmpty) })
+                .sorted(by: { $0.responsibleName < $1.responsibleName })
+        }
+
+        return mergedByDateManipulations
+            .filter({ $0.date.contains(date.orEmpty) })
+            .sorted(by: { $0.responsibleName < $1.responsibleName })
     }
 
     private func didSelectFilterDatePicker(_ date: String) {
@@ -133,23 +204,26 @@ final class AverageListViewController: CoordinatedViewController {
         let all = "Todos"
         let manipulationsFiltered = manipulations.filter { $0.date == date }
 
-        if productFiltered == all {
-            self.rootView.manipulations = manipulationsFiltered
-        } else {
-            self.rootView.manipulations = manipulations.filter { $0.date == date && $0.product == productFiltered }
-        }
-
+        self.rootView.manipulations = productFiltered == all
+        ? manipulationsFiltered
+        : manipulations.filter { $0.date == date && $0.product == productFiltered }
     }
 }
 
-extension Sequence {
-    func grouped<T: Equatable>(by block: (Element) throws -> T) rethrows -> [[Element]] {
-        return try reduce(into: []) { result, element in
-            if let lastElement = result.last?.last, try block(lastElement) == block(element) {
-                result[result.index(before: result.endIndex)].append(element)
-            } else {
-                result.append([element])
-            }
-        }
-    }
+struct GroupedProductByDate: Hashable {
+    let product: String
+    let date: String
+}
+
+struct GroupedProduct: Hashable {
+    let product: String
+}
+
+struct GroupedByContributorsManipulations: Hashable {
+    let responsibleName: String
+}
+
+struct GroupedByDateContributorsManipulations: Hashable {
+    let responsibleName: String
+    let date: String
 }

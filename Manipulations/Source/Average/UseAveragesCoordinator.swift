@@ -2,7 +2,7 @@
 //  UseAveragesCoordinator.swift
 //  Manipulations
 //
-//  Created by Leonardo Portes on 31/12/22.
+//  Created by Leonardo Portes on 31/08/22.
 //
 
 import Foundation
@@ -31,4 +31,8 @@ extension UseAveragesCoordinator {
         coordinator.start(averageType: averageType, products, contributors, manipulations)
     }
 
+    func openManipulationList(for item: String) {
+        let coordinator = ManipulationsCoordinator(with: configuration)
+        coordinator.start(products: [], contributors: [])
+    }
 }

@@ -23,8 +23,7 @@ final class RegisterManipulationConfirmStepCoordinator: BaseCoordinator {
         )
         configuration.navigationController?.navigationBar.topItem?.backButtonTitle = ""
         configuration.navigationController?.navigationBar.tintColor = .blackHigh
-        controller.modalPresentationStyle = .pageSheet
-        configuration.navigationController?.present(controller, animated: true)
+        configuration.navigationController?.pushViewController(controller, animated: true)
     }
 
     func pop() {

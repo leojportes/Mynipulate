@@ -21,52 +21,52 @@ final class ManipulationsTableViewCell: UITableViewCell, ViewCodeContract {
 
     private lazy var baseView = UIView() .. {
         $0.translatesAutoresizingMaskIntoConstraints = false
-        $0.backgroundColor = .neutralLow
+        $0.backgroundColor = .back
         $0.roundCorners(cornerRadius: 15)
     }
     
-    private lazy var productTitleLabel = MNLabel(text: "Salmão") .. {
-        $0.font = .boldSystemFont(ofSize: 15)
+    private lazy var productTitleLabel = MNLabel(textColor: .misteryGreen) .. {
+        $0.font = .boldSystemFont(ofSize: .medium)
     }
     
-    private lazy var dateRangeLabel = MNLabel(text: "2022") .. {
+    private lazy var dateRangeLabel = MNLabel(textColor: .misteryGreen) .. {
         $0.textAlignment = .right
         $0.font = .systemFont(ofSize: 14)
     }
     
     private lazy var horizontalLine1 = UIView() .. {
         $0.translatesAutoresizingMaskIntoConstraints = false
-        $0.backgroundColor = .opaqueSeparator
+        $0.backgroundColor = .neutralLow
         $0.heightAnchor(1)
     }
     
-    private lazy var averagePorcentLabel = MNLabel(text: "Aproveitamento médio") .. {
+    private lazy var averagePorcentLabel = MNLabel(text: "Aproveitamento médio", textColor: .misteryGreen) .. {
         $0.font = .systemFont(ofSize: 14)
     }
 
-    private lazy var averagePorcentValueLabel = MNLabel(text: "45,56%", textColor: .neutral) .. {
+    private lazy var averagePorcentValueLabel = MNLabel(textColor: .neutral) .. {
         $0.textAlignment = .right
         $0.font = .systemFont(ofSize: 13)
     }
 
     private lazy var horizontalLine2 = UIView() .. {
         $0.translatesAutoresizingMaskIntoConstraints = false
-        $0.backgroundColor = .opaqueSeparator
+        $0.backgroundColor = .neutralLow
         $0.heightAnchor(1)
     }
 
-    private lazy var responsibleLabel = MNLabel(text: "Responsável") .. {
+    private lazy var responsibleLabel = MNLabel(text: "Responsável", textColor: .misteryGreen) .. {
         $0.font = .systemFont(ofSize: 14)
     }
 
-    private lazy var responsibleValueLabel = MNLabel(text: "Leonardo p", textColor: .neutral) .. {
+    private lazy var responsibleValueLabel = MNLabel(textColor: .neutral) .. {
         $0.textAlignment = .right
         $0.font = .systemFont(ofSize: 13)
     }
     
     private lazy var dotsLabel = MNLabel(text: "...") .. {
         $0.textAlignment = .center
-        $0.textColor = .neutral
+        $0.textColor = .misteryGreen
     }
     
     required init?(coder: NSCoder) {

@@ -39,7 +39,7 @@ final class ContributorsTableViewCell: UITableViewCell, ViewCodeContract {
     private let contributorsIcon = UIImageView() .. {
         $0.translatesAutoresizingMaskIntoConstraints = false
         $0.image = UIImage(systemName: "person.circle.fill")
-        $0.setImageColor(color: .neutral)
+        $0.setImageColor(color: .misteryGreen)
     }
     
     func setupHierarchy() {

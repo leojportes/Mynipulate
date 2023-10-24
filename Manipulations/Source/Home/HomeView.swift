@@ -29,6 +29,13 @@ final class HomeView: UIView {
     private let didTapAddManipulation: Action
     private let didTapAddProduct: Action
     private let isContributorMode: Bool
+    private var user: UserModel { Current.shared.user }
+
+    var chartData: (dataPoints: [String], values: [Double]) = ([], []) {
+        didSet {
+            chart.setChart(dataPoints: chartData.dataPoints, values: chartData.values)
+        }
+    }
 
     private let items: [MenuItems] = [
         .init(title: "Manipulações", icon: .icon(for: .manipulations)),
@@ -41,9 +48,22 @@ final class HomeView: UIView {
 
     // MARK: - View code
 
+    private lazy var scrollView = UIScrollView() .. {
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.showsVerticalScrollIndicator = false
+    }
+
+    private let scrollBaseView = UIView() .. {
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.backgroundColor = .back
+        $0.roundCorners(cornerRadius: 15, typeCorners: [.topLeft, .topRight])
+    }
+
     private lazy var profileView = ProfileHeaderView(
         onTap: weakify { $0.didTapProfileView() }
-    ) .. { $0.set(company: "Mirante da Ilha Restaurante", document: "00.323.323/0001-84") }
+    ) .. {
+        $0.set(company: user.companyName, document: user.document.format(mask: .brazilianDocument) ?? user.document)
+    }
 
     private let baseView = UIView() .. {
         $0.translatesAutoresizingMaskIntoConstraints = false
@@ -67,13 +87,13 @@ final class HomeView: UIView {
         $0.layer.cornerRadius = .medium
     }
 
-    private lazy var eventsMenuItem = MenuItemView(
-        onTap: weakify { $0.didTapAddProduct() }
-    ) .. {
-        $0.addShadow()
-        $0.set(title: "Eventos", message: "Obtenha métricas dos seus eventos.", isBlock: true)
-        $0.layer.cornerRadius = .medium
-    }
+    //    private lazy var eventsMenuItem = MenuItemView(
+    //        onTap: weakify { $0.didTapAddProduct() }
+    //    ) .. {
+    //        $0.addShadow()
+    //        $0.set(title: "Eventos", message: "Obtenha métricas dos seus eventos.", isBlock: true)
+    //        $0.layer.cornerRadius = .medium
+    //    }
 
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -122,18 +142,29 @@ final class HomeView: UIView {
         $0.isHidden = isContributorMode.not
     }
 
+
+
+    private lazy var chart = MNAvarageChartView() .. {
+        $0.translatesAutoresizingMaskIntoConstraints = false
+    }
+
+    private let viewEXAMPLE = MNView()
 }
 
 // MARK: - View code contract
 extension HomeView: ViewCodeContract {
     func setupHierarchy() {
         addSubview(profileView)
-        addSubview(baseView)
-        addSubview(collectionView)
-        addSubview(addManipulationMenuItem)
-        addSubview(addProductMenuItem)
-        addSubview(eventsMenuItem)
-        addSubview(alertView)
+        addSubview(scrollBaseView)
+        scrollBaseView.addSubview(scrollView)
+        scrollView.addSubview(baseView)
+        baseView.addSubview(collectionView)
+        baseView.addSubview(addManipulationMenuItem)
+        baseView.addSubview(addProductMenuItem)
+        // addSubview(eventsMenuItem)
+        baseView.addSubview(alertView)
+        baseView.addSubview(chart)
+        baseView.addSubview(viewEXAMPLE)
     }
     
     func setupConstraints() {
@@ -143,11 +174,21 @@ extension HomeView: ViewCodeContract {
             .rightAnchor(in: self)
             .heightAnchor(65)
 
-        baseView
+        scrollBaseView
             .topAnchor(in: profileView, attribute: .bottom, padding: 30)
             .leftAnchor(in: self)
             .rightAnchor(in: self)
             .bottomAnchor(in: self, layoutOption: .useMargins)
+
+        scrollView
+            .pin(toEdgesOf: scrollBaseView, layoutOption: .useMargins)
+
+        baseView
+            .pin(toEdgesOf: scrollView)
+        baseView
+            .widthAnchor(in: scrollView, 1)
+            .heightAnchor(in: scrollView, 1, withLayoutPriorityValue: 250)
+
         
         alertView
             .topAnchor(in: baseView, padding: .xLarge2)
@@ -162,18 +203,30 @@ extension HomeView: ViewCodeContract {
     
         addManipulationMenuItem
             .topAnchor(in: collectionView, attribute: .bottom, padding: .medium)
-            .leftAnchor(in: self, padding: .medium)
-            .rightAnchor(in: self, padding: .medium)
+            .leftAnchor(in: baseView, padding: .medium)
+            .rightAnchor(in: baseView, padding: .medium)
 
         addProductMenuItem
             .topAnchor(in: addManipulationMenuItem, attribute: .bottom, padding: .medium)
-            .leftAnchor(in: self, padding: .medium)
-            .rightAnchor(in: self, padding: .medium)
+            .leftAnchor(in: baseView, padding: .medium)
+            .rightAnchor(in: baseView, padding: .medium)
         
-        eventsMenuItem
-            .topAnchor(in: addProductMenuItem, attribute: .bottom, padding: .medium)
-            .leftAnchor(in: self, padding: .medium)
-            .rightAnchor(in: self, padding: .medium)
+        //        eventsMenuItem
+        //            .topAnchor(in: addProductMenuItem, attribute: .bottom, padding: .medium)
+        //            .leftAnchor(in: self, padding: .medium)
+        //            .rightAnchor(in: self, padding: .medium)
+        chart
+            .topAnchor(in: addProductMenuItem, attribute: .bottom, padding: .xLarge2)
+            .leftAnchor(in: baseView, padding: .small)
+            .heightAnchor(200)
+            .rightAnchor(in: baseView, padding: .small)
+
+        viewEXAMPLE
+            .topAnchor(in: chart, attribute: .bottom, padding: .xLarge)
+            .leftAnchor(in: baseView, padding: .small)
+            .heightAnchor(300)
+            .rightAnchor(in: baseView, padding: .small)
+            .bottomAnchor(in: baseView)
     }
    
     override func layoutSubviews() {
@@ -211,11 +264,6 @@ extension HomeView: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let item = items[indexPath.row].title
         guard let selectedItem = MenuCollectionType(rawValue: item) else { return }
-
-        if isContributorMode {
-            if selectedItem == .averages { return }
-        }
-
         didTapItem(selectedItem)
     }
     

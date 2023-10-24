@@ -23,7 +23,7 @@ class RegisterContributorsViewModel: RegisterContributorsViewModelProtocol {
 
     // MARK: Routes
     func registerContributor(contributor: RegisterContributor, completion: @escaping (Bool) -> Void) {
-        guard let url = URL(string: "http://192.168.0.2:3000/contributor") else {
+        guard let url = URL(string: "\(Current.shared.localhost):3000/contributor") else {
             print("Error: cannot create URL")
             return
         }

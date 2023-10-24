@@ -12,6 +12,7 @@ enum ButtonFilterType: String {
     case penultimateYear = "2021"
     case lastYear = "2022"
     case thisYear = "2023"
+    case nextYear = "2024"
     case custom = "Personalizado"
 }
 
@@ -28,6 +29,7 @@ final class FilterSegmentedControl: UIView, ViewCodeContract {
     let today = SegmentedControlButton(title: ButtonFilterType.penultimateYear.rawValue)
     let sevenDays = SegmentedControlButton(title: ButtonFilterType.lastYear.rawValue)
     let thirtyDays = SegmentedControlButton(title: ButtonFilterType.thisYear.rawValue)
+    let nextYear = SegmentedControlButton(title: ButtonFilterType.nextYear.rawValue)
     let custom = SegmentedControlButton(title: ButtonFilterType.custom.rawValue)
 
     var currentIndexFilter: ButtonFilterType = .all {
@@ -44,7 +46,7 @@ final class FilterSegmentedControl: UIView, ViewCodeContract {
         didSelectIndexClosure: @escaping (ButtonFilterType) -> Void,
         didSelectDateClosure: @escaping (String) -> Void
     ) {
-        self.segmentedControlButtons = [all, today, sevenDays, thirtyDays, custom]
+        self.segmentedControlButtons = [all, today, sevenDays, thirtyDays, nextYear, custom]
         self.didSelectIndexClosure = didSelectIndexClosure
         self.didSelectDateClosure = didSelectDateClosure
         super.init(frame: .zero)
@@ -193,8 +195,8 @@ class SegmentedControlButton: UIButton {
         super.init(frame: .zero)
         self.translatesAutoresizingMaskIntoConstraints = false
         self.setTitle(title, for: .normal)
-        self.titleLabel?.font = .systemFont(ofSize: 14)
-        self.setTitleColor(.black, for: .normal)
+        self.titleLabel?.font = .boldSystemFont(ofSize: 14)
+        self.setTitleColor(.misteryGreen, for: .normal)
         self.backgroundColor = UIColor.init(white: 0.1, alpha: 0.1)
         self.roundCorners(cornerRadius: 15)
         self.contentEdgeInsets = UIEdgeInsets(top: 0, left: 12, bottom: 0, right: 12)

@@ -20,11 +20,9 @@ class RegisterManipulationViewModel: RegisterManipulationViewModelProtocol {
     init(coordinator: RegisterManipulationCoordinator?) {
         self.coordinator = coordinator
     }
-
  
     func openRegisterManipulationSecondStep(_ model: RegisterManipulationFirstStep) {
         coordinator?.openRegisterManipulationSecondStep(model)
     }
-   
 
 }

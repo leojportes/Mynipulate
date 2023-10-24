@@ -51,7 +51,7 @@ class HomeViewModel: HomeViewModelProtocol, HomeViewModelOutputProtocol {
     }
 
     var isContributorsMode: Bool {
-        MNUserDefaults.get(boolForKey: .contributorMode) ?? true
+        Current.shared.isContributorMode
     }
 
     private func fetchProductItems() {

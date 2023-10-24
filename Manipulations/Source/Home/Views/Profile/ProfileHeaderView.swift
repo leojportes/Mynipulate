@@ -37,7 +37,7 @@ final class ProfileHeaderView: UIView {
     private lazy var iconView: UIView = {
         let container = UIView()
         container.backgroundColor = .back
-        container.roundCorners(cornerRadius: 25)
+        container.roundCorners(cornerRadius: 24)
         container.translatesAutoresizingMaskIntoConstraints = false
         return container
     }()

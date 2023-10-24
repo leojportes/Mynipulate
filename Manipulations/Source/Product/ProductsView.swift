@@ -87,7 +87,7 @@ extension ProductsView: UITableViewDelegate, UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-   
+        if Current.shared.isContributorMode { return }
         if editingStyle == .delete {
             didTapDelete(products[indexPath.row]._id)
             if products.count == 0 {

@@ -7,32 +7,41 @@
 
 import Foundation
 
-public struct Manipulation: Codable {
+public struct Manipulation: Codable, Hashable {
+    let _id: String
     let emailFirebase: String
     let product: String
     let productType: String
     let date: String
     let responsibleName: String
     let supplier: String
-    let grossWeight: String
-    let cleanWeight: String
+    var grossWeight: Double
+    var cleanWeight: Double
     let thawedWeight: String?
     let skinWeight: String?
     
     let cookedWeight: String?
     let headlessWeight: String?
     let discardWeight: String?
-    
-    
-    var avarage: String {
-        let gross = grossWeight.removingKgCharacter
-        let clean = cleanWeight.removingKgCharacter
-        let grossWeight = Double(gross) ?? 0.0
-        let cleanWeight = Double(clean) ?? 0.0
-        let avarage = (cleanWeight / grossWeight) * 100
-        
-        return String(format: "%.2f", avarage) + " %"
+
+    var avarage: Double {
+        (cleanWeight / grossWeight) * 100
     }
+
+    var avarageDescription: String {
+        let percent = String(format: "%.2f", avarage)
+
+        if percent == "100.00" {
+            return "100%"
+        }
+
+        if percent.prefix(2).hasSuffix(".") {
+            return percent.prefix(2).replacingOccurrences(of: ".", with: "") + "%"
+        }
+
+        return percent.prefix(2) + "%"
+    }
+
 
     init(
         emailFirebase: String = "",
@@ -41,8 +50,8 @@ public struct Manipulation: Codable {
         date: String,
         responsibleName: String,
         supplier: String = "",
-        grossWeight: String,
-        cleanWeight: String,
+        grossWeight: Double,
+        cleanWeight: Double,
         thawedWeight: String? = "",
         skinWeight: String? = "",
         cookedWeight: String? = "",
@@ -62,5 +71,6 @@ public struct Manipulation: Codable {
         self.cookedWeight = cookedWeight
         self.headlessWeight = headlessWeight
         self.discardWeight = discardWeight
+        self._id = ""
     }
 }

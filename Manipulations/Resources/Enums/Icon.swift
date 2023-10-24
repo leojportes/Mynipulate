@@ -7,7 +7,7 @@
 
 import UIKit
 
-enum Icon: String {
+public enum Icon: String {
     case beard = "ic_beard"
     case report = "ic_report"
     case help = "ic_help"

@@ -78,17 +78,19 @@ extension UIView {
 extension UIView {
     
     func addGradientColor(
-        _ colorTop: CGColor = UIColor.purpleHigh.cgColor,
-        _ colorBottom: CGColor = UIColor.purpleLight.cgColor
+        _ colorTop: CGColor = UIColor.darkGreen.cgColor,
+        _ colorBottom: CGColor = UIColor.misteryGreen.cgColor,
+        baseView: UIView? = nil,
+        maxX: CGFloat = 100.0,
+        maxY: CGFloat = 500.0
     ) {
         let gradientLayer = CAGradientLayer()
-        gradientLayer.frame = self.bounds
+        let base = baseView ?? self
+        gradientLayer.frame = base.bounds
         gradientLayer.colors = [colorTop, colorBottom]
-        let maxx:CGFloat = 100.0 // or whatever
-        let maxy:CGFloat = 500.0 // or whatever
         gradientLayer.startPoint = CGPoint(x: 0,y: 0)
-        gradientLayer.endPoint = CGPoint(x: maxx/self.bounds.width, y: maxy/self.bounds.height)
-        self.layer.insertSublayer(gradientLayer, at: 0)
+        gradientLayer.endPoint = CGPoint(x: maxX/base.bounds.width, y: maxY/base.bounds.height)
+        base.layer.insertSublayer(gradientLayer, at: 0)
     }
 
 }

@@ -20,22 +20,22 @@ final class AverageByProductTableViewCell: UITableViewCell, ViewCodeContract {
 
     private lazy var baseView = UIView() .. {
         $0.translatesAutoresizingMaskIntoConstraints = false
-        $0.backgroundColor = .neutralLow
+        $0.backgroundColor = .back
         $0.roundCorners(cornerRadius: 15)
     }
     
-    private lazy var productTitleLabel = MNLabel(text: "Salmão") .. {
+    private lazy var productTitleLabel = MNLabel() .. {
         $0.font = .boldSystemFont(ofSize: 15)
     }
     
-    private lazy var dateRangeLabel = MNLabel(text: "2022") .. {
+    private lazy var dateRangeLabel = MNLabel() .. {
         $0.textAlignment = .right
         $0.font = .systemFont(ofSize: 14)
     }
     
     private lazy var horizontalLine1 = UIView() .. {
         $0.translatesAutoresizingMaskIntoConstraints = false
-        $0.backgroundColor = .opaqueSeparator
+        $0.backgroundColor = .neutralLow
         $0.heightAnchor(1)
     }
     
@@ -43,14 +43,14 @@ final class AverageByProductTableViewCell: UITableViewCell, ViewCodeContract {
         $0.font = .systemFont(ofSize: 14)
     }
 
-    private lazy var averagePorcentValueLabel = MNLabel(text: "45,56%", textColor: .neutral) .. {
+    private lazy var averagePorcentValueLabel = MNLabel(textColor: .neutral) .. {
         $0.textAlignment = .right
         $0.font = .systemFont(ofSize: 13)
     }
 
     private lazy var horizontalLine2 = UIView() .. {
         $0.translatesAutoresizingMaskIntoConstraints = false
-        $0.backgroundColor = .opaqueSeparator
+        $0.backgroundColor = .neutralLow
         $0.heightAnchor(1)
     }
 
@@ -58,14 +58,14 @@ final class AverageByProductTableViewCell: UITableViewCell, ViewCodeContract {
         $0.font = .systemFont(ofSize: 14)
     }
 
-    private lazy var grossWeightValueLabel = MNLabel(text: "189,96Kg", textColor: .neutral) .. {
+    private lazy var grossWeightValueLabel = MNLabel(textColor: .neutral) .. {
         $0.textAlignment = .right
         $0.font = .systemFont(ofSize: 13)
     }
 
     private lazy var horizontalLine3 = UIView() .. {
         $0.translatesAutoresizingMaskIntoConstraints = false
-        $0.backgroundColor = .opaqueSeparator
+        $0.backgroundColor = .neutralLow
         $0.heightAnchor(1)
     }
     
@@ -73,7 +73,7 @@ final class AverageByProductTableViewCell: UITableViewCell, ViewCodeContract {
         $0.font = .systemFont(ofSize: 14)
     }
     
-    private lazy var cleanWeightValueLabel = MNLabel(text: "167,54Kg", textColor: .neutral) .. {
+    private lazy var cleanWeightValueLabel = MNLabel(textColor: .neutral) .. {
         $0.textAlignment = .right
         $0.font = .systemFont(ofSize: 13)
     }
@@ -88,8 +88,8 @@ final class AverageByProductTableViewCell: UITableViewCell, ViewCodeContract {
         productTitleLabel.text = productTitle
         dateRangeLabel.text = dateRange
         averagePorcentValueLabel.text = averagePorcent
-        grossWeightValueLabel.text = grossWeight
-        cleanWeightValueLabel.text = cleanWeight
+        grossWeightValueLabel.text = grossWeight.formatWeight
+        cleanWeightValueLabel.text = cleanWeight.formatWeight
     }
     
     required init?(coder: NSCoder) {

@@ -20,22 +20,22 @@ final class AverageByCollaboratorTableViewCell: UITableViewCell, ViewCodeContrac
 
     private lazy var baseView = UIView() .. {
         $0.translatesAutoresizingMaskIntoConstraints = false
-        $0.backgroundColor = .neutralLow
+        $0.backgroundColor = .back
         $0.roundCorners(cornerRadius: 15)
     }
     
-    private lazy var contributorTitleLabel = MNLabel(text: "Salmão") .. {
+    private lazy var contributorTitleLabel = MNLabel() .. {
         $0.font = .boldSystemFont(ofSize: 15)
     }
     
-    private lazy var dateRangeLabel = MNLabel(text: "2022") .. {
+    private lazy var dateRangeLabel = MNLabel() .. {
         $0.textAlignment = .right
         $0.font = .systemFont(ofSize: 14)
     }
     
     private lazy var horizontalLine1 = UIView() .. {
         $0.translatesAutoresizingMaskIntoConstraints = false
-        $0.backgroundColor = .opaqueSeparator
+        $0.backgroundColor = .neutralLow
         $0.heightAnchor(1)
     }
     
@@ -43,26 +43,17 @@ final class AverageByCollaboratorTableViewCell: UITableViewCell, ViewCodeContrac
         $0.font = .systemFont(ofSize: 14)
     }
 
-    private lazy var averagePorcentValueLabel = MNLabel(text: "45,56%", textColor: .neutral) .. {
+    private lazy var averagePorcentValueLabel = MNLabel(textColor: .neutral) .. {
         $0.textAlignment = .right
         $0.font = .systemFont(ofSize: 13)
     }
 
     private lazy var horizontalLine2 = UIView() .. {
         $0.translatesAutoresizingMaskIntoConstraints = false
-        $0.backgroundColor = .opaqueSeparator
+        $0.backgroundColor = .neutralLow
         $0.heightAnchor(1)
     }
 
-    private lazy var productLabel = MNLabel(text: "Produto") .. {
-        $0.font = .systemFont(ofSize: 14)
-    }
-
-    private lazy var productValueLabel = MNLabel(text: "Atum", textColor: .neutral) .. {
-        $0.textAlignment = .right
-        $0.font = .systemFont(ofSize: 13)
-    }
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -70,29 +61,22 @@ final class AverageByCollaboratorTableViewCell: UITableViewCell, ViewCodeContrac
     func bind(
         contributor: String,
         dateRange: String,
-        averagePorcent: String,
-        productName: String
+        averagePorcent: String
     ) {
         contributorTitleLabel.text = contributor
         dateRangeLabel.text = dateRange
         averagePorcentValueLabel.text = averagePorcent
-        productValueLabel.text = productName
     }
 
     func setupHierarchy() {
         addSubview(baseView)
-        
+
         baseView.addSubview(contributorTitleLabel)
         baseView.addSubview(dateRangeLabel)
         baseView.addSubview(horizontalLine1)
-        
         baseView.addSubview(averagePorcentLabel)
         baseView.addSubview(averagePorcentValueLabel)
         baseView.addSubview(horizontalLine2)
-        
-        baseView.addSubview(productLabel)
-        baseView.addSubview(productValueLabel)
-
     }
 
     func setupConstraints() {
@@ -126,30 +110,12 @@ final class AverageByCollaboratorTableViewCell: UITableViewCell, ViewCodeContrac
             .rightAnchor(in: baseView, padding: .medium)
             .heightAnchor(.large)
             .widthAnchor(100)
-        
-        horizontalLine2
-            .topAnchor(in: averagePorcentLabel, attribute: .bottom, padding: .xSmall)
-            .leftAnchor(in: baseView, padding: .medium)
-            .rightAnchor(in: baseView, padding: .medium)
-        
-        productLabel
-            .topAnchor(in: horizontalLine2, attribute: .bottom, padding: .xSmall)
-            .leftAnchor(in: baseView, padding: .medium)
-            .heightAnchor(.large)
-            .widthAnchor(100)
-        
-        productValueLabel
-            .topAnchor(in: horizontalLine2, attribute: .bottom, padding: .xSmall)
-            .rightAnchor(in: baseView, padding: .medium)
-            .heightAnchor(.large)
-            .widthAnchor(100)
-
     }
 
     func setupConfiguration() {
-        self.backgroundColor = .clear
-        self.roundCorners(cornerRadius: 10)
-        self.addShadow()
-        self.selectionStyle = .none
+        backgroundColor = .clear
+        roundCorners(cornerRadius: 10)
+        addShadow()
+        selectionStyle = .none
     }
 }
