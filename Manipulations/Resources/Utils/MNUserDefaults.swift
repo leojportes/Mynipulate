@@ -38,6 +38,27 @@ public class MNUserDefaults {
             defaults.synchronize()
         }
     }
+
+    public static func setRequestData(model: RequestData?, forKey key: Keys) {
+        let encoder = JSONEncoder()
+        if let encoded = try? encoder.encode(model) {
+            // Verifique se já existe uma lista armazenada em UserDefaults
+            if let existingData = defaults.data(forKey: key.rawValue) {
+                var requestDataList = try? JSONDecoder().decode([RequestData].self, from: existingData)
+                requestDataList?.append(model ?? .init(statusCode: -1, url: "optional nil"))
+                if let updatedData = try? JSONEncoder().encode(requestDataList) {
+                    defaults.set(updatedData, forKey: key.rawValue)
+                }
+            } else {
+                // Se não existe uma lista, crie uma nova lista com o objeto atual
+                let requestDataList: [RequestData] = [model ?? .init(statusCode: -1, url: "optional nil")]
+                if let updatedData = try? JSONEncoder().encode(requestDataList) {
+                    defaults.set(updatedData, forKey: key.rawValue)
+                }
+            }
+            defaults.synchronize()
+        }
+    }
     
     public static func set(value: Int, forKey key: String) {
         defaults.set(value, forKey: key)
@@ -81,7 +102,24 @@ public class MNUserDefaults {
         let items = try? JSONDecoder().decode(UserModel.self, from: data)
         return items
     }
-    
+
+//    public static func getRequestData(model: Keys) -> RequestData? {
+//        if checkExistenceKey(key: model.rawValue) == false {
+//            return nil
+//        }
+//        guard let data = defaults.object(forKey: model.rawValue) as? Data else { return nil }
+//        let items = try? JSONDecoder().decode(RequestData.self, from: data)
+//        return items
+//    }
+    public static func getRequestDataList(forKey key: Keys) -> [RequestData]? {
+        if let existingData = defaults.data(forKey: key.rawValue) {
+            if let requestDataList = try? JSONDecoder().decode([RequestData].self, from: existingData) {
+                return requestDataList
+            }
+        }
+        return nil
+    }
+
     // MARK: - Remove
     public static func remove(key: String) {
         defaults.removeObject(forKey: key)
@@ -99,5 +137,6 @@ extension MNUserDefaults {
         case loginWithApple = "loginWithApple"
         case rateApp = "rateApp"
         case currentUser = "currentUser"
+        case requestData = "requestData"
     }
 }

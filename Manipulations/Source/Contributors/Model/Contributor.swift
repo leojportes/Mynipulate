@@ -13,6 +13,9 @@ public struct Contributor: Codable {
     let documentBusiness: String
     let name: String
     let id: String
+
+    /// True for the active contributor.
+    let isActive: Bool
 }
 
 public struct RegisterContributor: Codable {
@@ -20,4 +23,17 @@ public struct RegisterContributor: Codable {
     let documentBusiness: String
     let name: String
     let id: String
+    let isActive: Bool
+
+    init(
+        emailFirebase: String,
+        documentBusiness: String,
+        name: String, id: String
+    ) {
+        self.emailFirebase = emailFirebase
+        self.documentBusiness = documentBusiness
+        self.name = name
+        self.id = id
+        isActive = true
+    }
 }

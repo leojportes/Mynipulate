@@ -33,7 +33,7 @@ class ProductService: ProductServiceProtocol {
 
     func deleteProduct(_ productId: String, completion: @escaping (String) -> Void) {
         let endpoint = "\(Current.shared.localhost):3000/product/\(productId)"
-        apiClient.performDeleteRequest(endpoint: endpoint) { (result: Result<String, Error>) in
+        apiClient.performRequestToDelete(endpoint: endpoint) { (result: Result<String, Error>) in
             switch result {
             case .success(let result):
                 completion(result)

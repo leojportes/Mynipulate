@@ -13,37 +13,34 @@ protocol ContributorsServiceProtocol {
 }
 
 class ContributorsService: ContributorsServiceProtocol {
-    
-    // Get contributor list
+    private let apiClient = APIClient()
+
+    /// Get contributor list.
     func getContributorList(completion: @escaping ([Contributor]) -> Void) {
-        // guard let email = Auth.auth().currentUser?.email else { return }
-        let urlString = "\(Current.shared.localhost):3000/contributor/\(Current.shared.email)"
-        guard let url = URL(string: urlString) else { return }
-        URLSession.shared.dataTask(with: url) { (data, response, error) in
-            guard let data = data else { return }
-            do {
-                let result = try JSONDecoder().decode([Contributor].self, from: data)
-                DispatchQueue.main.async {
-                    completion(result)
-                }
-            }
-            catch {
-                let error = error
+        let endpoint = "\(Current.shared.localhost):3000/contributor/\(Current.shared.email)"
+        apiClient.performRequest(
+            method: .get,
+            endpoint: endpoint
+        ) { (result: Result<[Contributor], Error>) in
+            switch result {
+            case .success(let contributors):
+                completion(contributors)
+            case .failure(let error):
                 print(error)
             }
-        }.resume()
+        }
     }
 
-    /// Delete contributor
+    /// Delete contributor by Id.
     func deleteContributor(_ contributorId: String, completion: @escaping (String) -> Void) {
-        guard let url = URL(string: "\(Current.shared.localhost):3000/contributor/\(contributorId)") else {
-            print("Error: cannot create URL")
-            return
+        let endpoint = "\(Current.shared.localhost):3000/contributor/\(contributorId)"
+        apiClient.performRequestToDelete(endpoint: endpoint) { (result: Result<String, Error>) in
+            switch result {
+            case .success(let result):
+                completion(result)
+            case .failure(let error):
+                print(error)
+            }
         }
-        var urlReq = URLRequest(url: url)
-        urlReq.httpMethod = "DELETE"
-        URLSession.shared.dataTask(with: urlReq) { data, response, error in
-            completion(error?.localizedDescription ?? "Deletado com sucesso!")
-        }.resume()
     }
 }

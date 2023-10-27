@@ -5,8 +5,9 @@
 //  Created by Leonardo Portes on 17/09/23.
 //
 
-import UIKit
 import Foundation
+import Network
+import UIKit
 
 class APIClient {
     private let networkCheck = NetworkCheck()
@@ -18,7 +19,7 @@ class APIClient {
     }
 
     /// Delete request.
-    func performDeleteRequest(
+    func performRequestToDelete(
         endpoint: String,
         completion: @escaping (Result<String, Error>) -> Void
     ) {
@@ -114,6 +115,16 @@ class APIClient {
 
             do {
                 let decodedData = try JSONDecoder().decode(T.self, from: data)
+                if let httpResponse = response as? HTTPURLResponse {
+                    let requestData = RequestData(
+                        statusCode: httpResponse.statusCode,
+                        url: httpResponse.url?.description ?? ""
+                    )
+                    print("URL: ", requestData.url)
+                    print("StatusCode: ", requestData.statusCode)
+                    print(httpResponse.allHeaderFields)
+                    MNUserDefaults.setRequestData(model: requestData, forKey: .requestData)
+                }
                 self.removeLoadingView(loadingView: loadingView)
                 return completion(.success(decodedData))
             } catch {
@@ -159,8 +170,6 @@ class APIClient {
         }
     }
 }
-
-import Network
 
 protocol NetworkCheckObserver: AnyObject {
     func statusDidChange(status: NWPath.Status)
@@ -209,4 +218,10 @@ class NetworkCheck {
         let id = ObjectIdentifier(observer)
         observations.removeValue(forKey: id)
     }
+}
+
+public struct RequestData: Codable {
+    let statusCode: Int
+    let url: String
+    // Outros dados relevantes ao seu request
 }

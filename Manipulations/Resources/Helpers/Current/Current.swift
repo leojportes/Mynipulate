@@ -32,4 +32,8 @@ public struct Current {
     var isContributorMode: Bool {
         MNUserDefaults.get(boolForKey: .contributorMode) ?? true
     }
+
+    var requestData: [RequestData] {
+        MNUserDefaults.getRequestDataList(forKey: .requestData) ?? []
+    }
 }
