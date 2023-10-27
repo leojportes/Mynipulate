@@ -17,6 +17,8 @@ extension CGFloat {
     public static let xSmall: CGFloat = 8.0
     /// 12.
     public static let small: CGFloat = 12.0
+    /// 14.
+    public static let xMedium: CGFloat = 14.0
     /// 16.
     public static let medium: CGFloat = 16.0
     /// 20.

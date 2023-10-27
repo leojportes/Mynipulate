@@ -335,15 +335,14 @@ final class AvaragesCollectionCell: UICollectionViewCell, ViewCodeContract {
             .rightAnchor(in: contentView, padding: .medium)
     }
 
+    // MARK: - Bind method
     func bind(title: String, image: UIImage?, average: String, averageDisclamer: String) {
         titleLabel.text = title
         iconView.image = image
         iconView.setImageColor(color: .neutral)
         averageLabel.text = average
         averageDisclamerLabel.text = averageDisclamer
-        if average == "100%" {
-            averageLabel.textColor = .systemGreen
-        }
+        averageLabel.textColor = average.percentColor
     }
 
     override func prepareForReuse() {
@@ -351,5 +350,16 @@ final class AvaragesCollectionCell: UICollectionViewCell, ViewCodeContract {
         iconView.image = nil
         averageDisclamerLabel.text = nil
         averageLabel.text = nil
+    }
+}
+
+private extension String {
+    var percentColor: UIColor {
+        let percent = Int(self.decimalsOnly) ?? 0
+        switch percent {
+        case 0...40: return .systemRed.withAlphaComponent(0.8)
+        case 41...60: return .systemYellow.withAlphaComponent(0.8)
+        default: return .systemGreen
+        }
     }
 }

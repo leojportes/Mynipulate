@@ -28,9 +28,13 @@ class CustomTextField: UITextField {
         showBaseLine: Bool = false
     ) {
         super.init(frame: .zero)
+        let placeholderFont = UIFont.systemFont(ofSize: .medium)
         self.attributedPlaceholder = NSAttributedString(
             string: titlePlaceholder,
-            attributes: [NSAttributedString.Key.foregroundColor: colorPlaceholder]
+            attributes: [
+                NSAttributedString.Key.foregroundColor: colorPlaceholder,
+                NSAttributedString.Key.font: placeholderFont
+            ]
         )
         self.textColor = textColor
         self.layer.cornerRadius = radius

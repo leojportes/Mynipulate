@@ -6,11 +6,15 @@
 //
 
 import Foundation
+import FirebaseAuth
 
 class RegisterAccountViewController: CoordinatedViewController {
 
     private lazy var customView = RegisterAccountView()
     private let viewModel: RegisterAccountViewModelProtocol
+    private var authUser : User? {
+        Auth.auth().currentUser
+    }
 
     init(
         viewModel: RegisterAccountViewModelProtocol,
@@ -30,7 +34,6 @@ class RegisterAccountViewController: CoordinatedViewController {
         self.hideKeyboardWhenTappedAround()
     }
 
-
     override func loadView() {
         super.loadView()
         self.view = customView
@@ -43,18 +46,23 @@ class RegisterAccountViewController: CoordinatedViewController {
                 if result {
                     weakSelf.accountCreatedSuccessfully()
                 } else {
-                    weakSelf.showAlert(title: "Atenção", message: descriptionError)
+                    weakSelf.showAlert(title: "Oops!", message: descriptionError)
                 }
             })
         }
-        customView.closedView = weakify { $0.viewModel.closed()}
     }
 
     private func accountCreatedSuccessfully() {
-        showAlert(title: "Parabéns!", message: "Conta criada com sucesso.") {
-            self.viewModel.closed()
+        if self.authUser != nil && Current.shared.isEmailVerified.not {
+            self.authUser!.sendEmailVerification() { (error) in
+                self.showAlert(
+                    title: "Parabéns!",
+                    message: "Conta criada com sucesso. \n Foi enviado para seu email um link de verificação. Após verificar, retorne ao app para efetuar o login. \n Verifique sua caixa de spam."
+                ) {
+                    self.viewModel.closed()
+                }
+            }
         }
     }
-
 
 }

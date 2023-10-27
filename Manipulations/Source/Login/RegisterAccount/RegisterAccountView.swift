@@ -11,7 +11,6 @@ class RegisterAccountView: UIView {
 
     private var isSecureTextEntry: Bool = false
     var createAccount: ((String, String) -> Void)?
-    var closedView: Action?
 
     init() {
         super.init(frame: .zero)
@@ -49,6 +48,18 @@ class RegisterAccountView: UIView {
         let label = MNLabel(
             text: "Criar Conta",
             font: UIFont.boldSystemFont(ofSize: 20),
+            textColor: .misteryGreen
+        )
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        return label
+    }()
+
+
+    private lazy var subtitleLabel: MNLabel = {
+        let label = MNLabel(
+            text: "Informe um e-mail válido e uma senha com\nno minimo 8 caracteres para criar a sua conta.",
+            font: UIFont.systemFont(ofSize: 16),
             textColor: .darkGray
         )
         label.textAlignment = .center
@@ -56,103 +67,100 @@ class RegisterAccountView: UIView {
         return label
     }()
 
-
-    private lazy var subTitleLabel: MNLabel = {
-        let label = MNLabel(text: "Informe um e-mail válido e uma senha com \n no minimo 8 dígitos para criar a sua conta.",
-                            font: UIFont.systemFont(ofSize: 16),
-                            textColor: .darkGray)
-        label.textAlignment = .center
-        label.numberOfLines = 0
-        return label
-    }()
-
-    lazy var emailTextField: CustomTextField = {
-        let textField = CustomTextField(
-            titlePlaceholder: "e-mail",
-            colorPlaceholder: .lightGray,
-            textColor: .darkGray,
-            radius: 5,
-            borderColor: UIColor.systemGray.cgColor,
-            borderWidth: 0.5,
+    private lazy var usernameTextField = CustomTextField(
+            titlePlaceholder: "Informe um e-mail válido",
+            colorPlaceholder: .neutral,
+            textColor: .neutralHigh,
+            radius: 10,
+            borderColor: .neutral.cgColor,
+            borderWidth: 1,
             keyboardType: .emailAddress
-        )
-        textField.addTarget(self, action: #selector(handleTextFieldDidChange(_:)), for: .editingChanged)
-        return textField
-    }()
+    )
 
-    lazy var passwordTextField: CustomTextField = {
-        let textField = CustomTextField(
-            titlePlaceholder: "senha",
-            colorPlaceholder: .lightGray,
-            textColor: .darkGray,
-            radius: 5,
-            borderColor: UIColor.systemGray.cgColor,
-            borderWidth: 0.5,
-            isSecureTextEntry: true
-        )
-        textField.textContentType = .oneTimeCode
-        textField.addTarget(self, action: #selector(handleTextFieldDidChange(_:)), for: .editingChanged)
-        return textField
-    }()
+    private lazy var passwordTextField = CustomTextField(
+        titlePlaceholder: "Informe uma senha",
+        colorPlaceholder: .neutral,
+        textColor: .neutralHigh,
+        radius: 10,
+        borderColor: .neutral.cgColor,
+        borderWidth: 1,
+        isSecureTextEntry: true
+    ) .. {
+        $0.textContentType = .oneTimeCode
+    }
 
-    lazy var createAccountButton: CustomSubmitButton = {
-        let button = CustomSubmitButton(
-            title: "Criar conta",
-            colorTitle: .purpleLight,
-            radius: 25,
-            background: .clear,
-            borderColorCustom: UIColor.purpleLight.cgColor,
-            borderWidthCustom: 1
-        )
-        button.isEnabled = false
-        button.addTarget(self, action: #selector(handleCreateAccountButton), for: .touchUpInside)
-        return button
-    }()
+    lazy var createAccountButton = CustomSubmitButton(
+        title: "Criar conta",
+        colorTitle: .back,
+        radius: 25,
+        background: .misteryGreen,
+        borderColorCustom: UIColor.misteryGreen.cgColor,
+        borderWidthCustom: 1
+    ) .. {
+        $0.addTarget(self, action: #selector(handleCreateAccountButton), for: .touchUpInside)
+    }
 
     func isEnabledButtonCreateAccount(_ isEnabled: Bool) {
         if isEnabled {
-            createAccountButton.backgroundColor = .white.withAlphaComponent(0.7)
+            createAccountButton.backgroundColor = .misteryGreen
             createAccountButton.isEnabled = true
         } else {
-            createAccountButton.backgroundColor = .white.withAlphaComponent(0.7)
+            createAccountButton.backgroundColor = .misteryGreen.withAlphaComponent(0.7)
             createAccountButton.isEnabled = false
-        }
-    }
-
-    // MARK: - Action TextFields
-    @objc
-    func handleTextFieldDidChange(_ textField: UITextField) {
-        guard let email = emailTextField.text else { return }
-        guard let password = passwordTextField.text else { return }
-        let isInvalidPasswordFormat = (password.count > 7).not
-        let isInvalidEmailFormat = email.isValidEmail().not
-
-        emailTextField.layer.borderColor = isInvalidEmailFormat
-            ? UIColor.systemRed.cgColor
-            : UIColor.systemGray.cgColor
-
-        passwordTextField.layer.borderColor = isInvalidPasswordFormat
-            ? UIColor.systemRed.cgColor
-            : UIColor.systemGray.cgColor
-
-        if isInvalidEmailFormat.not && isInvalidPasswordFormat.not {
-            createAccountButton.isEnabled = true
         }
     }
 
     // MARK: - Action Buttons
     @objc
     func handleCreateAccountButton() {
-        createAccountButton.loadingIndicator(show: true)
-        guard let email = emailTextField.text else { return }
+        guard let email = usernameTextField.text else { return }
         guard let password = passwordTextField.text else { return }
-        let isInvalidPasswordFormat = (password.count > 7).not
-        let isInvalidEmailFormat = email.isValidEmail().not
+        let isValidPassword = password.count > 7
+        let isValidUsername = email.isValidEmail()
 
-        if isInvalidEmailFormat.not && isInvalidPasswordFormat.not {
-            createAccount?(emailTextField.text.orEmpty, passwordTextField.text.orEmpty)
+        setTextFieldValidationStates(isValidUsername, isValidPassword)
+        if isValidUsername && isValidPassword {
+            createAccountButton.loadingIndicator(show: true)
+            createAccount?(usernameTextField.text.orEmpty, passwordTextField.text.orEmpty)
+        }
+    }
+
+    private func setTextFieldValidationStates(_ isValidUsername: Bool, _ isValidPassword: Bool) {
+        if isValidPassword.not && isValidUsername.not {
+            usernameTextField.layer.borderColor = UIColor.orange.cgColor
+            passwordTextField.layer.borderColor = UIColor.orange.cgColor
+            obrigatoryFieldsLabel.isHidden = false
+            shake(views: [usernameTextField, passwordTextField, eyeButton])
+            return
+            //     return showAlert(title: "Oops!", message: "E-mail e senha com formato inválido.\nPor favor, digite um e-mail válido e senha com no mínimo 8 caracteres.")
         }
 
+        if isValidUsername.not {
+            shake(views: [usernameTextField])
+            obrigatoryFieldsLabel.isHidden = false
+            usernameTextField.layer.borderColor = UIColor.orange.cgColor
+            passwordTextField.layer.borderColor = .neutral.cgColor
+            return
+            // return showAlert(title: "Oops!", message: "E-mail com formato inválido.\nPor favor, digite um e-mail válido.")
+        }
+
+        if isValidPassword.not {
+            usernameTextField.layer.borderColor = .neutral.cgColor
+            passwordTextField.layer.borderColor = UIColor.orange.cgColor
+            obrigatoryFieldsLabel.isHidden = false
+            shake(views: [passwordTextField, eyeButton])
+            return
+            //  return showAlert(title: "Oops!", message: "A senha deve ser igual ou maior que 8 caracteres.")
+        }
+        obrigatoryFieldsLabel.isHidden = true
+    }
+
+    private let obrigatoryFieldsLabel = MNLabel(
+        text: "Campo obrigatório",
+        font: .systemFont(ofSize: .small),
+        textColor: .orange
+    ) .. {
+        $0.isHidden = true
     }
 
     @objc
@@ -161,13 +169,33 @@ class RegisterAccountView: UIView {
             isSecureTextEntry = false
             eyeButton.setImage(UIImage(systemName: "eye"), for: .normal)
             passwordTextField.isSecureTextEntry = true
-        }else {
+        } else {
             isSecureTextEntry = true
             eyeButton.setImage(UIImage(systemName: "eye.slash"), for: .normal)
             passwordTextField.isSecureTextEntry = false
         }
     }
 
+    // MARK: - Aux methods
+    private func shake(views: [UIView]) {
+        views.forEach { view in
+            view.transform = CGAffineTransform(translationX: 25, y: 0)
+        }
+
+        UIView.animate(
+            withDuration: 0.4,
+            delay: 0,
+            usingSpringWithDamping: 0.2,
+            initialSpringVelocity: 1,
+            options: .curveEaseInOut,
+            animations: {
+                views.forEach { view in
+                    view.transform = CGAffineTransform.identity
+                }
+            },
+            completion: nil
+        )
+    }
 }
 
 extension RegisterAccountView: ViewCodeContract {
@@ -176,11 +204,12 @@ extension RegisterAccountView: ViewCodeContract {
         scrollView.addSubview(contentView)
         contentView.addSubview(gripView)
         contentView.addSubview(titleLabel)
-        contentView.addSubview(subTitleLabel)
-        contentView.addSubview(emailTextField)
+        contentView.addSubview(subtitleLabel)
+        contentView.addSubview(usernameTextField)
         contentView.addSubview(passwordTextField)
         contentView.addSubview(createAccountButton)
         contentView.addSubview(eyeButton)
+        contentView.addSubview(obrigatoryFieldsLabel)
     }
 
     func setupConstraints() {
@@ -207,24 +236,29 @@ extension RegisterAccountView: ViewCodeContract {
             .topAnchor(in: gripView, attribute: .bottom, padding: 44)
             .centerX(in: self)
 
-        subTitleLabel
+        subtitleLabel
             .topAnchor(in: titleLabel, attribute: .bottom, padding: 16)
             .centerX(in: self)
 
-        emailTextField
-            .topAnchor(in: subTitleLabel, attribute: .bottom, padding: .xLarge5)
+        usernameTextField
+            .topAnchor(in: subtitleLabel, attribute: .bottom, padding: .xLarge5)
             .leftAnchor(in: contentView, attribute: .left, padding: 16)
             .rightAnchor(in: contentView, attribute: .right, padding: 16)
             .heightAnchor(48)
 
         passwordTextField
-            .topAnchor(in: emailTextField, attribute: .bottom, padding: 24)
+            .topAnchor(in: usernameTextField, attribute: .bottom, padding: 24)
             .leftAnchor(in: contentView, attribute: .left, padding: 16)
             .rightAnchor(in: contentView, attribute: .right, padding: 16)
             .heightAnchor(48)
 
+        obrigatoryFieldsLabel
+            .topAnchor(in: passwordTextField, attribute: .bottom, padding: .xMedium)
+            .leftAnchor(in: contentView, attribute: .left, padding: 16)
+            .rightAnchor(in: contentView, attribute: .right, padding: 16)
+
         eyeButton
-            .topAnchor(in: emailTextField, attribute: .bottom, padding: 24)
+            .topAnchor(in: usernameTextField, attribute: .bottom, padding: 24)
             .rightAnchor(in: passwordTextField)
             .widthAnchor(48)
             .heightAnchor(48)

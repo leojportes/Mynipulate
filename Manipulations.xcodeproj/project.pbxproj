@@ -146,6 +146,8 @@
 		C0A674CA2AAA6EA700B9CEFC /* UserOnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A674C92AAA6EA700B9CEFC /* UserOnboardingViewModel.swift */; };
 		C0A674CC2AAA6EFC00B9CEFC /* UserOnboardingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A674CB2AAA6EFC00B9CEFC /* UserOnboardingCoordinator.swift */; };
 		C0A674CE2AAA713900B9CEFC /* UINavigationController+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A674CD2AAA713900B9CEFC /* UINavigationController+Ext.swift */; };
+		C0B430AC2AE8C18F00370C49 /* MNFonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B430AB2AE8C18F00370C49 /* MNFonts.swift */; };
+		C0B430B02AE8C35100370C49 /* Spartan-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C0B430AF2AE8C35100370C49 /* Spartan-SemiBold.ttf */; };
 		C0B819FB2995A30A00DC8C66 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B819FA2995A30A00DC8C66 /* ProfileViewController.swift */; };
 		C0B819FD2995A31100DC8C66 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B819FC2995A31100DC8C66 /* ProfileView.swift */; };
 		C0B819FF2995A31A00DC8C66 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B819FE2995A31A00DC8C66 /* ProfileViewModel.swift */; };
@@ -322,6 +324,8 @@
 		C0A674C92AAA6EA700B9CEFC /* UserOnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserOnboardingViewModel.swift; sourceTree = "<group>"; };
 		C0A674CB2AAA6EFC00B9CEFC /* UserOnboardingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserOnboardingCoordinator.swift; sourceTree = "<group>"; };
 		C0A674CD2AAA713900B9CEFC /* UINavigationController+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Ext.swift"; sourceTree = "<group>"; };
+		C0B430AB2AE8C18F00370C49 /* MNFonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MNFonts.swift; sourceTree = "<group>"; };
+		C0B430AF2AE8C35100370C49 /* Spartan-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Spartan-SemiBold.ttf"; sourceTree = "<group>"; };
 		C0B819FA2995A30A00DC8C66 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		C0B819FC2995A31100DC8C66 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		C0B819FE2995A31A00DC8C66 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
@@ -505,6 +509,7 @@
 			isa = PBXGroup;
 			children = (
 				C0334755295E0B3C0069C97F /* Icon.swift */,
+				C0B430AB2AE8C18F00370C49 /* MNFonts.swift */,
 			);
 			path = Enums;
 			sourceTree = "<group>";
@@ -633,6 +638,7 @@
 		C03347BA295E0DDE0069C97F /* Infra */ = {
 			isa = PBXGroup;
 			children = (
+				C0B430A92AE8C0B100370C49 /* Fonts */,
 				C0EDCB6A2ADF85DF003C93DE /* fishingLoading.json */,
 				C007211F2AB95715001ADAF5 /* loading.json */,
 				C033473A295E071F0069C97F /* SceneDelegate.swift */,
@@ -869,6 +875,14 @@
 			path = CheckAccount;
 			sourceTree = "<group>";
 		};
+		C0B430A92AE8C0B100370C49 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				C0B430AF2AE8C35100370C49 /* Spartan-SemiBold.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
 		C0B819F92995A2F600DC8C66 /* Profile */ = {
 			isa = PBXGroup;
 			children = (
@@ -1014,6 +1028,7 @@
 				C0115B352A771A4C00B4ABB6 /* GoogleService-Info.plist in Resources */,
 				C0DDAB6D29D1431A0038DD39 /* fishBackgroundHome.mov in Resources */,
 				C0334742295E07210069C97F /* Assets.xcassets in Resources */,
+				C0B430B02AE8C35100370C49 /* Spartan-SemiBold.ttf in Resources */,
 				C00721202AB95715001ADAF5 /* loading.json in Resources */,
 				C0EDCB6B2ADF85DF003C93DE /* fishingLoading.json in Resources */,
 			);
@@ -1117,6 +1132,7 @@
 				C03347A1295E0B3C0069C97F /* BottomSheetView.swift in Sources */,
 				C08AE64229D27BAD00143114 /* ProductService.swift in Sources */,
 				C0E20064298200500086637D /* ManipulationsDetailView.swift in Sources */,
+				C0B430AC2AE8C18F00370C49 /* MNFonts.swift in Sources */,
 				C074B7ED2AB7E7FC000D6488 /* LoadingView.swift in Sources */,
 				C01EDEC82991E0DA007DE0A3 /* ProductsViewModel.swift in Sources */,
 				C0083C4B2A01E30F00A148BF /* RegisterAccountCoordinator.swift in Sources */,
@@ -1380,8 +1396,7 @@
 				INFOPLIST_FILE = Manipulations/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1418,8 +1433,7 @@
 				INFOPLIST_FILE = Manipulations/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (

@@ -85,10 +85,7 @@ final class HomeViewController: CoordinatedViewController {
             .string(dateStyle: .small) ?? ""
         
         months.append(lastYear)
-
         return months
-            .sorted(by: { $0.suffix(4) < $1.suffix(4) })
-
     }
 
     private func retrieveAveragesByYearsOf(manipulations: [GraphManipulation]) -> [Double] {

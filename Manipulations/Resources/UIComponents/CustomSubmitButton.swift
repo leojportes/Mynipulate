@@ -9,6 +9,7 @@ import Foundation
 import UIKit
 
 class CustomSubmitButton: UIButton {
+    private let onTap: Action
     
     var showLockView: Bool = false {
         didSet {
@@ -25,14 +26,18 @@ class CustomSubmitButton: UIButton {
         $0.isHidden = true
     }
     
-    init(title: String,
-         colorTitle: UIColor = .neutralHigh,
-         radius: CGFloat = 10,
-         background: UIColor = .clear,
-         alignmentText: ContentHorizontalAlignment = .center,
-         borderColorCustom: CGColor = UIColor.clear.cgColor,
-         borderWidthCustom: CGFloat = CGFloat(),
-         fontSize: CGFloat = 18) {
+    init(
+        title: String,
+        colorTitle: UIColor = .neutralHigh,
+        radius: CGFloat = 10,
+        background: UIColor = .clear,
+        alignmentText: ContentHorizontalAlignment = .center,
+        borderColorCustom: CGColor = UIColor.clear.cgColor,
+        borderWidthCustom: CGFloat = CGFloat(),
+        fontSize: CGFloat = 18,
+        action: @escaping () -> Void = {}
+    ) {
+        self.onTap = action
         super.init(frame: .zero)
         self.setTitle(title, for: .normal)
         self.setTitleColor(colorTitle, for: .normal)
@@ -43,7 +48,7 @@ class CustomSubmitButton: UIButton {
         self.layer.borderWidth = borderWidthCustom
         self.titleLabel?.font = .boldSystemFont(ofSize: fontSize)
         self.translatesAutoresizingMaskIntoConstraints = false
-        
+        self.addTarget(self, action: #selector(onTapAction), for: .touchUpInside)
         addSubview(lockView)
         lockView
             .centerY(in: self)
@@ -53,6 +58,8 @@ class CustomSubmitButton: UIButton {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    
+
+    @objc func onTapAction() {
+        onTap()
+    }
 }

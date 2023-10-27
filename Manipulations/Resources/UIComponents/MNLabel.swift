@@ -8,7 +8,6 @@
 import UIKit
 
 class MNLabel: UILabel {
-    
     init(
         text: String = "",
         font: UIFont = UIFont.boldSystemFont(ofSize: 14),
